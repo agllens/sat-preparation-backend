@@ -86,4 +86,7 @@ public class AnalyticsService {
         return attempts.get(0).getSatScore();
     }
 
+    public List<Attempt> getUserAttempts(User user) {
+        return attemptRepository.findByUserOrderByCreatedAtAsc(user);
+    }
 }
