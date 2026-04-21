@@ -1,5 +1,6 @@
 package com.sat_preparation_backend.attempts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class AttemptSection {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Attempt attempt;
 
     private String sectionName;
