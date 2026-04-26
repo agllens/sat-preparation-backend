@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SATify</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    /* =============================================
+       SCORES AREA 
+       ============================================= */
+
+    .scores-area {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      max-width: 960px;
+      height: 320px;
+      margin: 40px auto 32px;
+      border-radius: 32px;
+      background: radial-gradient(
+        ellipse 60% 80% at 50% 50%,
+        rgba(29, 59, 230, 0.08) 0%,
+        rgba(29, 59, 230, 0.03) 50%,
+        transparent 75%
+      );
+    }
+
+    /* ── Center line ── */
+    .center-line {
+      position: absolute;
+      left: 50%;
+      top: 16px;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: 4px;
+      border-radius: 999px;
+      background: #1d3be6;
+      z-index: 2;
+      box-shadow: 0 0 16px rgba(29, 59, 230, 0.25);
+    }
+
+    /* ── Bubble base ── */
+    .bubble {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #ffffff;
+      z-index: 3;
+      cursor: pointer;
+
+      /* Scroll reveal: start hidden */
+      opacity: 0;
+      transform: translateY(24px) scale(0.85);
+      transition:
+        opacity 0.55s cubic-bezier(.22,1,.36,1),
+        transform 0.55s cubic-bezier(.22,1,.36,1),
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+    }
+
+    /* Visible state (added by JS on scroll) */
+    .bubble.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ── Score pill ── */
+    .bubble.score {
+      height: 66px;
+      padding: 0 34px;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      z-index: 4;
+      box-shadow:
+        0 8px 28px rgba(17, 17, 17, 0.08),
+        0 2px 6px  rgba(17, 17, 17, 0.04);
+    }
+
+    /* ── Avatar circle ── */
+    .bubble.avatar {
+      width: 66px;
+      height: 66px;
+      box-shadow:
+        0 8px 24px rgba(17, 17, 17, 0.07),
+        0 2px 6px  rgba(17, 17, 17, 0.04);
+    }
+
+    .bubble.avatar svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── LEFT gray/inactive ── */
+    .bubble.gray.score {
+      color: rgba(17, 17, 17, 0.20);
+    }
+    .bubble.gray.avatar {
+      background: #f4f4f6;
+      box-shadow: 0 4px 14px rgba(17, 17, 17, 0.05);
+    }
+    .bubble.gray.avatar svg {
+      stroke: rgba(17, 17, 17, 0.20);
+    }
+
+    /* ── RIGHT blue/active ── */
+    .bubble.blue.score {
+      background: #eceffe;
+      color: #1d3be6;
+      box-shadow:
+        0 10px 32px rgba(29, 59, 230, 0.16),
+        0 2px 8px  rgba(29, 59, 230, 0.08);
+    }
+    .bubble.blue.avatar {
+      background: #ffffff;
+      border: 2.5px solid #1d3be6;
+      box-shadow:
+        0 10px 28px rgba(29, 59, 230, 0.14),
+        0 2px 8px  rgba(29, 59, 230, 0.07);
+    }
+    .bubble.blue.avatar svg {
+      stroke: #1d3be6;
+    }
+
+    /* ── Hover ── */
+    .bubble.is-visible:hover {
+      transform: translateY(-5px) scale(1.05) !important;
+      z-index: 10 !important;
+      filter: brightness(1.02);
+    }
+    .bubble.is-visible:active {
+      transform: scale(0.95) !important;
+    }
+
+    /* ── Float (only after visible) ── */
+    @keyframes floatA { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-8px)} }
+    @keyframes floatB { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-6px)} }
+    @keyframes floatC { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-10px)} }
+    @keyframes floatD { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-7px)} }
+    @keyframes floatE { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-9px)} }
+    @keyframes floatF { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-5px)} }
+
+    .bubble.floating { transition: box-shadow 0.2s ease, filter 0.2s ease; }
+    .bubble.floating.fa { animation: floatA 3.8s ease-in-out infinite; }
+    .bubble.floating.fb { animation: floatB 4.4s ease-in-out infinite; }
+    .bubble.floating.fc { animation: floatC 3.5s ease-in-out infinite; }
+    .bubble.floating.fd { animation: floatD 4.8s ease-in-out infinite; }
+    .bubble.floating.fe { animation: floatE 3.2s ease-in-out infinite; }
+    .bubble.floating.ff { animation: floatF 5.0s ease-in-out infinite; }
+
+    .bubble.floating.fa { animation-delay:  0.0s; }
+    .bubble.floating.fb { animation-delay: -1.1s; }
+    .bubble.floating.fc { animation-delay: -2.3s; }
+    .bubble.floating.fd { animation-delay: -0.6s; }
+    .bubble.floating.fe { animation-delay: -1.8s; }
+    .bubble.floating.ff { animation-delay: -3.1s; }
+
+    .bubble.floating:hover { animation-play-state: paused !important; }
+
+    /* ── Click ripple ── */
+    .bubble .rip {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(29, 59, 230, 0.12);
+      transform: scale(0);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .bubble.gray .rip { background: rgba(17,17,17,0.07); }
+    .bubble .rip.go {
+      animation: ripGo 0.44s ease-out forwards;
+    }
+    @keyframes ripGo {
+      0%   { transform: scale(0.7); opacity: 0.8; }
+      100% { transform: scale(2.4); opacity: 0;   }
+    }
+
+    /* ── Click bounce ── */
+    @keyframes cBounce {
+      0%  { transform: scale(1); }
+      30% { transform: scale(0.88); }
+      68% { transform: scale(1.11); }
+      100%{ transform: scale(1); }
+    }
+    .bubble.bouncing {
+      animation: cBounce 0.38s cubic-bezier(.34,1.56,.64,1) !important;
+    }
+
+    /* ── center line subtle pulse ── */
+    @keyframes linePulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 16px rgba(29,59,230,0.25); }
+      50%     { opacity: 0.75; box-shadow: 0 0 8px rgba(29,59,230,0.12); }
+    }
+    .center-line {
+      animation: linePulse 3s ease-in-out infinite;
+    }
+
+    /* POSITIONS — tuned for 960px container, no overlaps */
+
+    /* LEFT SIDE */
+    /* avatar top-left */
+    .b-l1 { top: 12%;  left: 5%; }
+    /* 810 pill */
+    .b-l2 { top: 10%;  left: 18%; }
+    /* avatar middle-left (near center) */
+    .b-l3 { top: 10%;  left: 40%; }
+    /* avatar row2 */
+    .b-l4 { top: 54%;  left: 28%; }
+    /* 700 pill */
+    .b-l5 { top: 52%;  left: 10%; }
+    /* 630 pill */
+    .b-l6 { top: 52%;  left: 30%; }
+
+    /* RIGHT SIDE */
+    /* avatar near center */
+    .b-r1 { top: 10%;  right: 40%; }
+    /* 1450 pill */
+    .b-r2 { top: 10%;  right: 18%; }
+    /* avatar top-right */
+    .b-r3 { top: 12%;  right: 5%; }
+    /* avatar row2 right */
+    .b-r4 { top: 54%;  right: 28%; }
+    /* 1460 pill */
+    .b-r5 { top: 52%;  right: 30%; }
+    /* 1500 pill */
+    .b-r6 { top: 52%;  right: 8%; }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .bubble { transition: none !important; animation: none !important; }
+      .bubble.is-visible { opacity: 1; transform: none; }
+      .center-line { animation: none !important; }
+    }
+  </style>
+</head>
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float { bottom: 20px; right: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before { animation: none; }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 10h8M8 13.5h5"/>
+    </svg>
+  </a>
+</div>
+
+<body>
+
+  <div id="header-mount"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1 class="hero-title">SAT-қа ақылды түрде дайындал</h1>
+
+    <p class="hero-sub">
+      Жеке жоспар, толық аналитика және нақты нәтиже.<br/>
+      Мақсатың – 1500+ ма? Бізбен бірге жет.
+    </p>
+
+    <div class="scores-area" id="scoresArea">
+      <div class="center-line"></div>
+
+      <!-- LEFT inactive -->
+      <div class="bubble avatar gray b-l1" data-fi="0"><div class="rip"></div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg></div>
+      <div class="bubble score  gray b-l2" data-fi="1"><div class="rip"></div>810</div>
+      <div class="bubble avatar gray b-l3" data-fi="2"><div class="rip"></div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg></div>
+
+      <div class="bubble score  gray b-l5" data-fi="4"><div class="rip"></div>700</div>
+      <div class="bubble score  gray b-l6" data-fi="5"><div class="rip"></div>630</div>
+
+      <!-- RIGHT active -->
+      <div class="bubble avatar blue b-r1" data-fi="0"><div class="rip"></div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg></div>
+      <div class="bubble score  blue b-r2" data-fi="1"><div class="rip"></div>1450</div>
+      <div class="bubble avatar blue b-r3" data-fi="2"><div class="rip"></div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg></div>
+
+      <div class="bubble score  blue b-r5" data-fi="4"><div class="rip"></div>1460</div>
+      <div class="bubble score  blue b-r6" data-fi="5"><div class="rip"></div>1500</div>
+    </div>
+
+    <div class="buttons">
+      <button class="primary"   onclick="window.location.href='practice.html'">Байқау тест</button>
+      <button class="secondary" onclick="window.location.href='full-test.html'">Толық тест</button>
+    </div>
+  </section>
+
+
+  <!-- SAT SECTIONS -->
+  <section class="sat-sections" id="sections">
+    <h2 class="sat-sections__title">SAT бөлімдері</h2>
+    <div class="sat-sections__grid">
+
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M8 7.5h8M8 11h8M8 14.5h6" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8.5 3.5h7l3 3v13a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">27 сұрақ</div>
+          <div class="sat-card__heading">Reading</div>
+          <a class="sat-card__btn" href="practice.html">Жаттығуды бастау</a>
+        </div>
+      </article>
+
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M7 7h10M7 12h10M7 17h10" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M7 7v10M12 7v10M17 7v10" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">44 сұрақ</div>
+          <div class="sat-card__heading">Math</div>
+          <a class="sat-card__btn" href="practice.html">Жаттығуды бастау</a>
+        </div>
+      </article>
+
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.8L16.3 4.5a2 2 0 0 0-2.8 0L3 15v5Z" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M13.5 6.5l4 4" stroke="var(--blue,#1d3be6)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">27 сұрақ</div>
+          <div class="sat-card__heading">Writing</div>
+          <a class="sat-card__btn" href="practice.html">Жаттығуды бастау</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- SAT DUEL SECTION -->
+<section class="duel-section" id="duel">
+  <style>
+    .duel-section {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto 72px;
+      padding: 64px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    /* ── LEFT ── */
+    
+
+    .duel-section__title {
+      font-size: clamp(35px, 3.8vw, 46px);
+      font-weight: 800;
+      color: #1d3be6;
+      line-height: 1.13;
+      letter-spacing: -0.03em;
+      margin: 0 0 18px;
+    }
+
+    .duel-section__title span {
+      color: #1d3be6;
+    }
+
+    .duel-section__desc {
+      font-size: 16px;
+      line-height: 1.68;
+      color: rgba(17, 17, 17, 0.50);
+      margin: 0 0 34px;
+      max-width: 400px;
+    }
+
+    .duel-section__stats {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 38px;
+    }
+
+    .duel-stat__num {
+      font-size: 26px;
+      font-weight: 600;
+      color: #111111;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .duel-stat__lbl {
+      font-size: 13px;
+      color: rgba(17, 17, 17, 0.42);
+      margin-top: 5px;
+    }
+
+    .duel-section__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #1d3be6;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 15px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      box-shadow: 0 8px 24px rgba(29, 59, 230, 0.28);
+    }
+
+    .duel-section__btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(29, 59, 230, 0.36);
+      background: #162fd4;
+    }
+
+    .duel-section__btn:active {
+      transform: scale(0.97);
+    }
+
+    .duel-section__btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2.3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.18s ease;
+    }
+
+    .duel-section__btn:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ── RIGHT — RADAR ── */
+    .duel-section__right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .duel-radar {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Static rings */
+    .duel-radar__ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(29, 59, 230, 0.09);
+      pointer-events: none;
+    }
+    .duel-radar__ring:nth-child(1) { width: 76px;  height: 76px; }
+    .duel-radar__ring:nth-child(2) { width: 126px; height: 126px; }
+    .duel-radar__ring:nth-child(3) { width: 176px; height: 176px; }
+    .duel-radar__ring:nth-child(4) { width: 226px; height: 226px; }
+    .duel-radar__ring:nth-child(5) { width: 290px; height: 290px; }
+
+    /* Expanding pulse rings */
+    .duel-radar__pulse {
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 2px solid rgba(29, 59, 230, 0.50);
+      pointer-events: none;
+      animation: duelPulse 2.8s ease-out infinite;
+    }
+    .duel-radar__pulse:nth-of-type(1) { animation-delay: 0s; }
+    .duel-radar__pulse:nth-of-type(2) { animation-delay: 0.93s; }
+    .duel-radar__pulse:nth-of-type(3) { animation-delay: 1.86s; }
+
+    @keyframes duelPulse {
+      0%   { transform: scale(1);   opacity: 0.7; }
+      100% { transform: scale(3.9); opacity: 0;   }
+    }
+
+    /* Radar sweep line */
+    .duel-radar__sweep {
+      position: absolute;
+      width: 145px;
+      height: 2px;
+      left: 50%;
+      top: 50%;
+      transform-origin: 0% 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(90deg, rgba(29, 59, 230, 0.50), transparent);
+      border-radius: 0 2px 2px 0;
+      animation: duelSweep 3s linear infinite;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .duel-radar__sweep::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      background: rgba(29, 59, 230, 0.85);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(29, 59, 230, 0.9);
+    }
+
+    @keyframes duelSweep {
+      from { transform: translateY(-50%) rotate(0deg); }
+      to   { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    /* Center avatar */
+    .duel-radar__center {
+      position: relative;
+      z-index: 4;
+      width: 76px;
+      height: 76px;
+      background: #ffffff;
+      border: 2.5px solid #1d3be6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 0 0   8px  rgba(29, 59, 230, 0.07),
+        0 0 0  18px  rgba(29, 59, 230, 0.04),
+        0 0 32px 10px rgba(29, 59, 230, 0.18),
+        0 8px 32px    rgba(29, 59, 230, 0.22);
+      animation: duelBreath 3s ease-in-out infinite;
+    }
+
+    @keyframes duelBreath {
+      0%, 100% {
+        box-shadow:
+          0 0 0   8px  rgba(29, 59, 230, 0.07),
+          0 0 0  18px  rgba(29, 59, 230, 0.04),
+          0 0 32px 10px rgba(29, 59, 230, 0.18),
+          0 8px 32px    rgba(29, 59, 230, 0.22);
+      }
+      50% {
+        box-shadow:
+          0 0 0  13px  rgba(29, 59, 230, 0.11),
+          0 0 0  26px  rgba(29, 59, 230, 0.06),
+          0 0 44px 14px rgba(29, 59, 230, 0.28),
+          0 8px 40px    rgba(29, 59, 230, 0.30);
+      }
+    }
+
+    .duel-radar__center svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: #1d3be6;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Orbiting track */
+    .duel-radar__orbit {
+      position: absolute;
+      width: 226px;
+      height: 226px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 3;
+      animation: duelOrbit 7s linear infinite;
+    }
+
+    @keyframes duelOrbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* VS badge */
+    .duel-radar__vs {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      width: 40px;
+      height: 40px;
+      background: #1d3be6;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(29, 59, 230, 0.45);
+      animation: duelCounterOrbit 7s linear infinite;
+    }
+
+    @keyframes duelCounterOrbit {
+      from { transform: translateX(-50%) rotate(0deg); }
+      to   { transform: translateX(-50%) rotate(-360deg); }
+    }
+
+    /* Opponent avatar */
+    .duel-radar__opp {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      width: 52px;
+      height: 52px;
+      background: #f4f4f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: duelCounterOrbit 7s linear infinite;
+    }
+
+    .duel-radar__opp svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: rgba(17, 17, 17, 0.26);
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @media (max-width: 680px) {
+      .duel-section {
+        grid-template-columns: 1fr;
+        padding: 48px 0;
+        gap: 40px;
+      }
+      .duel-section__right { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .duel-radar__pulse,
+      .duel-radar__sweep,
+      .duel-radar__orbit,
+      .duel-radar__vs,
+      .duel-radar__opp,
+      .duel-radar__center { animation: none !important; }
+    }
+  </style>
+
+  <!-- LEFT -->
+  <div class="duel-section__left">
+    <div class="duel-section__label"></div>
+    <h2 class="duel-section__title">SAT <span>Duel</span></h2>
+    <p class="duel-section__desc">
+      Екі оқушы онлайн түрде бір-бірімен жарысады. Жүйе автоматты түрде сәйкестендіреді — бірдей сұрақтар, бір уақыт. Кім тез әрі дұрыс — сол жеңеді.
+    </p>
+    <div class="duel-section__stats">
+      <div>
+        <div class="duel-stat__num">1 v 1</div>
+        <div class="duel-stat__lbl">Нақты уақыт</div>
+      </div>
+      <div>
+        <div class="duel-stat__num">3 бөлім</div>
+        <div class="duel-stat__lbl">Reading · Math · Writing</div>
+      </div>
+    </div>
+    <a class="duel-section__btn" href="duelmain.html">
+      Дуэльге кіру
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <!-- RIGHT — radar -->
+  <div class="duel-section__right">
+    <div class="duel-radar">
+      <div class="duel-radar__ring"></div>
+      <div class="duel-radar__ring"></div>
+      <div class="duel-radar__ring"></div>
+      <div class="duel-radar__ring"></div>
+      <div class="duel-radar__ring"></div>
+
+      <div class="duel-radar__sweep"></div>
+
+      <div class="duel-radar__pulse"></div>
+      <div class="duel-radar__pulse"></div>
+      <div class="duel-radar__pulse"></div>
+
+      <div class="duel-radar__orbit">
+        <div class="duel-radar__vs">VS</div>
+        <div class="duel-radar__opp">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="duel-radar__center">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/></svg>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+  <!-- RESULTS -->
+  <section class="results" id="results">
+    <h2 class="results__title">Нәтижелер</h2>
+    <div class="results__viewport js-results-viewport" aria-label="SAT нәтижелері">
+      <div class="results__track">
+        <article class="result-card"><div class="result-card__score">1580 балл</div><div class="result-card__name">Sultan B.</div></article>
+        <article class="result-card"><div class="result-card__score">1510 балл</div><div class="result-card__name">Aglen Z.</div></article>
+        <article class="result-card"><div class="result-card__score">1570 балл</div><div class="result-card__name">Karakat T.</div></article>
+        <article class="result-card"><div class="result-card__score">1590 балл</div><div class="result-card__name">Almaz T.</div></article>
+        <article class="result-card"><div class="result-card__score">1510 балл</div><div class="result-card__name">Dastan B.</div></article>
+        <article class="result-card"><div class="result-card__score">1340 балл</div><div class="result-card__name">Zhanerke A.</div></article>
+        <article class="result-card"><div class="result-card__score">1480 балл</div><div class="result-card__name">Ilyas R.</div></article>
+        <article class="result-card"><div class="result-card__score">1390 балл</div><div class="result-card__name">Madina T.</div></article>
+        <article class="result-card"><div class="result-card__score">1350 балл</div><div class="result-card__name">Timur S.</div></article>
+        <article class="result-card"><div class="result-card__score">1380 балл</div><div class="result-card__name">Alina P.</div></article>
+        <article class="result-card"><div class="result-card__score">1400 балл</div><div class="result-card__name">Nurkhat R.</div></article>
+        <article class="result-card"><div class="result-card__score">1370 балл</div><div class="result-card__name">Zhanay A.</div></article>
+      </div>
+    </div>
+  </section>
+
+
+  <div id="footer-mount"></div>
+
+  <script src="project/js/main.js"></script>
+  <script src="project/js/script.js"></script>
+
+  <script>
+    /* =============================================
+       BUBBLE SCROLL REVEAL + FLOAT + INTERACTIONS
+       ============================================= */
+    (function () {
+      const floatMap = ['fa','fb','fc','fd','fe','ff'];
+      const bubbles  = Array.from(document.querySelectorAll('.bubble'));
+
+      /* ── IntersectionObserver for scroll reveal ── */
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          const bubble = entry.target;
+          const idx    = bubbles.indexOf(bubble);
+
+          /* stagger delay: left side comes from left, right from right */
+          const isRight  = bubble.classList.contains('blue');
+          const baseDelay = idx * 55; /* ms between each bubble */
+
+          setTimeout(() => {
+            bubble.classList.add('is-visible');
+
+            /* start floating after visible transition finishes */
+            setTimeout(() => {
+              const fi = parseInt(bubble.dataset.fi ?? 0);
+              bubble.classList.add('floating', floatMap[fi % floatMap.length]);
+            }, 580);
+
+          }, baseDelay);
+
+          io.unobserve(bubble);
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      bubbles.forEach(b => io.observe(b));
+
+      /* ── Click: bounce + ripple ── */
+      bubbles.forEach(bubble => {
+        bubble.addEventListener('click', function () {
+          /* bounce */
+          this.classList.remove('bouncing');
+          void this.offsetWidth;
+          this.classList.add('bouncing');
+          setTimeout(() => this.classList.remove('bouncing'), 420);
+
+          /* ripple */
+          const rip = this.querySelector('.rip');
+          if (rip) {
+            rip.classList.remove('go');
+            void rip.offsetWidth;
+            rip.classList.add('go');
+            setTimeout(() => rip.classList.remove('go'), 460);
+          }
+        });
+      });
+
+    })();
+  </script>
+
+</body>
+</html>

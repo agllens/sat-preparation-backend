@@ -1,0 +1,51 @@
+<!--
+  components/header_myprofile.html
+  Шапка для вошедших пользователей (показывает "Менің профилім" вместо "Кіру").
+  Загружается через main.js когда в localStorage есть "token".
+-->
+<header class="site-header">
+  <div class="site-header__container">
+
+    <a href="index.html" class="site-header__logo-link">
+      <img
+        src="assets/satify-footer-logo.png"
+        alt="SATify — Басты бет"
+        class="site-header__logo"
+      />
+    </a>
+
+    <nav class="site-header__nav" id="site-nav" role="navigation" aria-label="Негізгі навигация">
+      <a href="index.html"     class="site-header__link" data-nav-link="index.html">Басты бет</a>
+      <a href="full-test.html" class="site-header__link" data-nav-link="full-test.html">Толық тест</a>
+      <a href="practice.html"  class="site-header__link" data-nav-link="practice.html">Практика</a>
+      <a href="dashboard.html" class="site-header__link" data-nav-link="dashboard.html">Бақылау тақтасы</a>
+      <a href="duelmain.html"  class="site-header__link" data-nav-link="duelmain.html">Duel</a>
+      <a href="about.html"     class="site-header__link" data-nav-link="about.html">Біз туралы</a>
+    </nav>
+
+    <div class="site-header__actions">
+
+      <a href="profile.html" class="site-header__loginBtn">Менің профилім</a>
+
+      <button
+        class="site-header__hamburger"
+        id="nav-toggle"
+        aria-label="Менюді ашу/жабу"
+        aria-expanded="false"
+        aria-controls="site-nav"
+      >
+        <svg id="icon-hamburger" viewBox="0 0 24 24" fill="none">
+          <line x1="3" y1="6"  x2="21" y2="6"  />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <svg id="icon-close" viewBox="0 0 24 24" fill="none" style="display:none;">
+          <line x1="4" y1="4"  x2="20" y2="20" />
+          <line x1="20" y1="4" x2="4"  y2="20" />
+        </svg>
+      </button>
+
+    </div>
+
+  </div>
+</header>

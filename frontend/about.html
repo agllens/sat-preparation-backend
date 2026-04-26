@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Біз туралы — SATify</title>
+
+  <!-- keep your global styles (header/footer injection etc.) -->
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    :root{
+      --blue:#1d3be6;
+      --text:#111318;
+      --muted:#6b7280;
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
+    body{
+      background:#fff;
+      font-family:Inter, system-ui, -apple-system, sans-serif;
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    /* ================================ HERO ================================ */
+    .hero{
+      padding: 92px 0 36px; /* tighter bottom (less white space) */
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+    .hero__inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 48px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:80px;
+      align-items:center;
+    }
+    .hero__tag{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--blue);
+      margin-bottom:20px;
+    }
+    .hero__title{
+      font-size:clamp(42px, 5.5vw, 68px);
+      font-weight:900;
+      line-height:1.05;
+      letter-spacing:-2px;
+    }
+    .hero__title em{ font-style:normal; color:var(--blue); }
+    .hero__desc{
+      font-size:18px;
+      color:var(--muted);
+      line-height:1.75;
+      margin-bottom:40px;
+    }
+    .hero__cta{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      height:52px;
+      padding:0 28px;
+      background:var(--blue);
+      color:#fff;
+      font-size:15px;
+      font-weight:700;
+      border-radius:12px;
+      text-decoration:none;
+      transition: opacity .15s, transform .15s;
+    }
+    .hero__cta:hover{ opacity:.88; transform:translateY(-1px); }
+
+    /* ================================ MARQUEE ================================ */
+    .strip{
+      background:var(--blue);
+      overflow:hidden;
+      padding:12px 0; /* slightly tighter */
+    }
+    .strip__track{
+      display:flex;
+      width:max-content;
+      animation: marquee 22s linear infinite;
+      will-change: transform;
+    }
+    @keyframes marquee{
+      from{ transform:translateX(0); }
+      to{ transform:translateX(-50%); }
+    }
+    .strip__item{
+      font-size:12px;
+      font-weight:700;
+      color:rgba(255,255,255,0.65);
+      letter-spacing:1.8px;
+      text-transform:uppercase;
+      white-space:nowrap;
+      padding:0 28px;
+      display:flex;
+      align-items:center;
+      gap:28px;
+    }
+    .strip__dot{
+      width:3px; height:3px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.35);
+      flex-shrink:0;
+    }
+
+    /* ================================ STATS ================================ */
+    .stats{
+      padding:80px 0;
+      border-bottom:1px solid rgba(0,0,0,0.07);
+    }
+    .stats__inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 48px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+    }
+    .stat{ padding:0 48px 0 0; }
+    .stat:not(:first-child){
+      padding-left:48px;
+      border-left:1px solid rgba(0,0,0,0.08);
+    }
+    .stat__num{
+      font-size:64px;
+      font-weight:900;
+      letter-spacing:-3px;
+      line-height:1;
+      margin-bottom:10px;
+    }
+    .stat__num b{ color:var(--blue); font-weight:inherit; }
+    .stat__label{ font-size:15px; color:var(--muted); font-weight:500; }
+
+    /* ================================ SECTIONS ================================ */
+    .section{ padding:100px 0; border-bottom:1px solid rgba(0,0,0,0.07); }
+    .section--dark{ background:#111318; border-color:transparent; }
+    .section--blue{ background:var(--blue); border-color:transparent; }
+    .section--grey{ background:#f4f5f8; }
+
+    .section__inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 48px;
+    }
+    .section__grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:80px;
+      align-items:center;
+    }
+    .section__grid--flip{ direction:rtl; }
+    .section__grid--flip > *{ direction:ltr; }
+
+    .section__label{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+    .section--dark .section__label{ color:rgba(255,255,255,0.35); }
+    .section--blue .section__label{ color:rgba(255,255,255,0.5); }
+
+    .section__title{
+      font-size:clamp(32px, 4vw, 48px);
+      font-weight:800;
+      letter-spacing:-1.5px;
+      line-height:1.1;
+      margin-bottom:20px;
+    }
+    .section--dark .section__title{ color:#fff; }
+    .section--blue .section__title{ color:#fff; }
+
+    .section__body{
+      font-size:17px;
+      color:var(--muted);
+      line-height:1.75;
+    }
+    .section--dark .section__body{ color:rgba(255,255,255,0.5); }
+    .section--blue .section__body{ color:rgba(255,255,255,0.68); }
+
+    .bigNum{
+      font-size:clamp(120px, 18vw, 200px);
+      font-weight:900;
+      letter-spacing:-8px;
+      line-height:.9;
+      color:rgba(0,0,0,0.05);
+      user-select:none;
+      pointer-events:none;
+    }
+    .section--dark .bigNum{ color:rgba(255,255,255,0.05); }
+    .section--blue .bigNum{ color:rgba(255,255,255,0.14); }
+    .section--grey .bigNum{ color:rgba(0,0,0,0.05); }
+
+    .offerList{ margin-top:32px; }
+    .offerRow{
+      display:flex;
+      align-items:baseline;
+      gap:20px;
+      padding:18px 0;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .offerRow:first-child{ border-top:1px solid rgba(255,255,255,0.08); }
+    .offerRow__num{
+      font-size:11px;
+      font-weight:700;
+      color:rgba(255,255,255,0.3);
+      letter-spacing:1px;
+      min-width:22px;
+      flex-shrink:0;
+    }
+    .offerRow__name{
+      font-size:18px;
+      font-weight:700;
+      color:#fff;
+    }
+
+    /* ================================ CLOSING ================================ */
+    .closing{ padding:100px 0; }
+    .closing__inner{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 48px;
+    }
+    .closing__quote{
+      font-size:clamp(28px, 4vw, 48px);
+      font-weight:800;
+      letter-spacing:-1.5px;
+      line-height:1.15;
+      max-width:760px;
+      margin-bottom:44px;
+    }
+    .closing__quote strong{ color:var(--blue); }
+    .closing__btns{ display:flex; gap:16px; flex-wrap:wrap; }
+
+    .btn-primary{
+      display:inline-flex; align-items:center; gap:8px;
+      height:54px; padding:0 32px;
+      background:var(--blue); color:#fff;
+      font-size:15px; font-weight:700; border-radius:12px;
+      text-decoration:none;
+      transition: opacity .15s, transform .15s;
+    }
+    .btn-primary:hover{ opacity:.88; transform:translateY(-1px); }
+
+    .btn-ghost{
+      display:inline-flex; align-items:center; gap:8px;
+      height:54px; padding:0 32px;
+      border:1.5px solid rgba(17,17,17,0.15); color:var(--text);
+      font-size:15px; font-weight:600; border-radius:12px;
+      text-decoration:none;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-ghost:hover{ border-color:var(--blue); color:var(--blue); }
+
+    /* ================================ REVEAL ================================ */
+    .reveal{
+      opacity:0;
+      transform:translateY(26px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.up{ opacity:1; transform:translateY(0); }
+
+    /* ================================ RESPONSIVE ================================ */
+    @media (max-width:900px){
+      .hero__inner, .section__grid, .stats__inner{ grid-template-columns:1fr; gap:40px; }
+      .section__grid--flip{ direction:ltr; }
+      .stat:not(:first-child){
+        border-left:none;
+        padding-left:0;
+        border-top:1px solid rgba(0,0,0,0.08);
+        padding-top:36px;
+      }
+    }
+    @media (max-width:640px){
+      .hero{ padding:60px 0 28px; }
+      .hero__inner, .section__inner, .stats__inner, .closing__inner{ padding:0 24px; }
+      .section{ padding:70px 0; }
+      .stats{ padding:60px 0; }
+      .stat__num{ font-size:48px; }
+      .closing{ padding:70px 0; }
+    }
+
+    /* =========================================================
+       IMPORTANT OVERRIDES (this is what fixes your "not working")
+       If your global style.css makes .strip fixed/sticky/bottom,
+       these lines force it back into normal flow.
+       Put them LAST so they win.
+    ========================================================= */
+    .strip{
+      position: static !important;
+      inset: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+    .hero{
+      min-height: auto !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float { bottom: 20px; right: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before { animation: none; }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 10h8M8 13.5h5"/>
+    </svg>
+  </a>
+</div>
+<body>
+  <div id="header-mount"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__inner">
+      <div class="reveal">
+        <div class="hero__tag">Біз туралы</div>
+        <h1 class="hero__title">SAT-қа<br>дайындалу —<br><em>басқаша.</em></h1>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.12s">
+        <p class="hero__desc">
+          SATify — SAT емтиханына дайындалуға арналған цифрлық платформа.
+          Біз дайындықты жүйелі, түсінікті және өлшенетін процесс ету үшін жасалдық.
+        </p>
+        <a href="full-test.html" class="hero__cta">
+          Тест тапсыру
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="strip">
+    <div class="strip__track" aria-hidden="true">
+      <div class="strip__item">SAT Mock Tests <span class="strip__dot"></span></div>
+      <div class="strip__item">Прогресс аналитикасы <span class="strip__dot"></span></div>
+      <div class="strip__item">Жеке оқу жоспары <span class="strip__dot"></span></div>
+      <div class="strip__item">Байқау тесттері <span class="strip__dot"></span></div>
+      <div class="strip__item">Reading &amp; Writing <span class="strip__dot"></span></div>
+      <div class="strip__item">Math Section <span class="strip__dot"></span></div>
+
+      <div class="strip__item">SAT Mock Tests <span class="strip__dot"></span></div>
+      <div class="strip__item">Прогресс аналитикасы <span class="strip__dot"></span></div>
+      <div class="strip__item">Жеке оқу жоспары <span class="strip__dot"></span></div>
+      <div class="strip__item">Байқау тесттері <span class="strip__dot"></span></div>
+      <div class="strip__item">Reading &amp; Writing <span class="strip__dot"></span></div>
+      <div class="strip__item">Math Section <span class="strip__dot"></span></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stats__inner">
+      <div class="stat reveal">
+        <div class="stat__num"><b id="s1">0</b>+</div>
+        <div class="stat__label">Белсенді қолданушы</div>
+      </div>
+      <div class="stat reveal" style="transition-delay:0.1s">
+        <div class="stat__num"><b id="s2">0</b>+</div>
+        <div class="stat__label">Тапсырылған тест</div>
+      </div>
+      <div class="stat reveal" style="transition-delay:0.2s">
+        <div class="stat__num"><b id="s3">0</b></div>
+        <div class="stat__label">Сұрақтар базасы</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO WE ARE -->
+  <section class="section section--grey">
+    <div class="section__inner">
+      <div class="section__grid">
+        <div class="reveal">
+          <div class="section__label">Платформа туралы</div>
+          <h2 class="section__title">Біз кімбіз</h2>
+          <p class="section__body">
+            SATify — енді дамып келе жатқан стартап. Қазір біз платформаны жетілдіріп,
+            алғашқы қолданушылармен бірге өсіп жатырмыз. Команда студенттердің нақты
+            сұраныстарына негізделген шешімдер жасайды.
+          </p>
+        </div>
+        <div class="reveal" style="transition-delay:0.15s">
+          <div class="bigNum">01</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT WE OFFER -->
+  <section class="section section--dark">
+    <div class="section__inner">
+      <div class="section__grid section__grid--flip">
+        <div class="reveal">
+          <div class="section__label">Мүмкіндіктер</div>
+          <h2 class="section__title">Біз не ұсынамыз</h2>
+          <div class="offerList">
+            <div class="offerRow"><span class="offerRow__num">01</span><span class="offerRow__name">SAT форматындағы жаттығулар</span></div>
+            <div class="offerRow"><span class="offerRow__num">02</span><span class="offerRow__name">Байқау тесттері</span></div>
+            <div class="offerRow"><span class="offerRow__num">03</span><span class="offerRow__name">Прогресс аналитикасы</span></div>
+            <div class="offerRow"><span class="offerRow__num">04</span><span class="offerRow__name">Жеке оқу жоспары</span></div>
+          </div>
+        </div>
+        <div class="reveal" style="transition-delay:0.15s">
+          <div class="bigNum">02</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="section section--blue">
+    <div class="section__inner">
+      <div class="section__grid">
+        <div class="reveal">
+          <div class="section__label">Миссия</div>
+          <h2 class="section__title">Неліктен жасалды</h2>
+          <p class="section__body">
+            Әр оқушының өз әлсіз тұстарын түсінуіне, мақсатты баллға сенімді жетуіне көмектесу.
+            Ұпай ғана емес — нақты білім арқылы нәтиже.
+          </p>
+        </div>
+        <div class="reveal" style="transition-delay:0.15s">
+          <div class="bigNum">03</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing">
+    <div class="closing__inner">
+      <p class="closing__quote reveal">Мақсатты баллға жетудің ең <strong>жүйелі жолы</strong> — осында.</p>
+      <div class="closing__btns reveal" style="transition-delay:0.1s">
+        <a href="full-test.html" class="btn-primary">
+          Тест тапсыру
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="dashboard.html" class="btn-ghost">Прогресімді көру</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-mount"></div>
+
+  <script src="project/js/main.js"></script>
+  <script>
+    // Scroll reveal
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('up'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Count-up
+    function countUp(el, target, dur) {
+      const t0 = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    }
+
+    let fired = false;
+    new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !fired) {
+        fired = true;
+        countUp(document.getElementById('s1'), 1200, 1400);
+        setTimeout(() => countUp(document.getElementById('s2'), 8400, 1600), 100);
+        setTimeout(() => countUp(document.getElementById('s3'), 360, 1200), 200);
+      }
+    }, { threshold: 0.4 }).observe(document.querySelector('.stats'));
+  </script>
+</body>
+</html>

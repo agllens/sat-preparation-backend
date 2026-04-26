@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAT Duel — Сұрақтар</title>
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f4f5f8;color:#111318;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* PAGE CONTENT */
+    .dPage{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:120px 48px 80px;}
+
+    /* TOP BAR */
+    .dTopBar{background:#fff;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,.025),0 14px 38px rgba(17,17,17,.055);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+    .dTopBar__title{font-size:22px;font-weight:800;color:#1d3be6;}
+    .dTopBar__center{font-size:15px;font-weight:600;color:#6b7280;}
+    .dTopBar__timer{font-size:17px;font-weight:700;color:#f97316;border:2px solid #f97316;border-radius:10px;padding:7px 18px;font-variant-numeric:tabular-nums;min-width:100px;text-align:center;}
+    .dTopBar__timer.urgent{color:#ef4444;border-color:#ef4444;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+    /* QUESTION CARD */
+    .dQCard{background:#fff;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,.025),0 14px 38px rgba(17,17,17,.055);padding:32px 36px 36px;margin-bottom:22px;}
+    .dQHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:16px;}
+    .dQTitleRow{display:flex;align-items:center;gap:14px;}
+    .dQNum{font-size:22px;font-weight:800;color:#111318;}
+    .dQPts{background:#1d3be6;color:#fff;font-size:14px;font-weight:700;padding:5px 14px;border-radius:999px;}
+    .dQTags{display:flex;gap:8px;flex-wrap:wrap;}
+    .dTag{height:30px;padding:0 14px;border-radius:999px;border:1px solid rgba(17,17,17,0.14);font-size:14px;font-weight:600;color:rgba(17,17,17,0.75);display:inline-flex;align-items:center;}
+    .dQText{font-size:18px;font-weight:600;color:#111318;line-height:1.55;margin-bottom:24px;}
+
+    /* OPTIONS */
+    .dOptions{display:flex;flex-direction:column;gap:12px;}
+    .dOption{width:100%;height:58px;border-radius:12px;border:1.5px solid rgba(17,17,17,0.12);background:#fff;display:flex;align-items:center;padding:0 20px;font-size:16px;font-weight:600;color:#111318;cursor:pointer;font-family:inherit;transition:all 150ms;text-align:left;}
+    .dOption:hover{border-color:rgba(29,59,230,0.35);transform:translateY(-1px);}
+    .dOption.sel{border-color:#1d3be6;background:rgba(29,59,230,0.08);}
+
+    /* NAV & GRID */
+    .dNavBar{background:#fff;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,0.025),0 14px 38px rgba(17,17,17,0.055);padding:20px 32px;margin-bottom:22px;}
+    .dNavRow{display:flex;align-items:center;justify-content:space-between;}
+    .dNavBtn{height:46px;padding:0 24px;border-radius:12px;border:1.5px solid rgba(17,17,17,0.14);background:#fff;font-size:15px;font-weight:700;color:#111318;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 150ms;}
+    .dNavBtn:hover{background:#f4f5f8;}
+    .dNavBtn:disabled{opacity:.35;cursor:default;}
+    .dMarkBtn{height:46px;padding:0 24px;border-radius:12px;border:2px solid #1d3be6;background:#fff;font-size:15px;font-weight:700;color:#1d3be6;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 150ms;}
+    .dMarkBtn.marked{background:#1d3be6;color:#fff;}
+
+    .dGrid{background:#fff;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,0.025),0 14px 38px rgba(17,17,17,0.055);padding:24px 32px 28px;}
+    .dGrid__title{font-size:18px;font-weight:800;color:#111318;margin-bottom:18px;}
+    .dDots{display:flex;flex-wrap:wrap;gap:10px;}
+    .dDot{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(17,17,17,0.16);background:#fff;font-size:13px;font-weight:700;color:#111318;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 150ms;}
+    .dDot.cur{background:#1d3be6;color:#fff;border-color:#1d3be6;}
+    .dDot.ans{background:rgba(29,59,230,0.08);color:#1d3be6;border-color:rgba(29,59,230,0.30);}
+    .dDot.mrk{background:rgba(249,115,22,0.10);color:#f97316;border-color:rgba(249,115,22,0.35);}
+
+    .dFinishRow{display:flex;justify-content:center;margin-top:28px;}
+    .dFinishBtn{height:56px;padding:0 52px;background:#1d3be6;color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;transition:all 150ms;}
+    .dFinishBtn:hover{filter:brightness(.9);transform:translateY(-2px);}
+
+    @media(max-width:700px){.dPage{padding:100px 16px 60px;}}
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<div class="dPage">
+  <div class="dTopBar">
+    <div class="dTopBar__title">SAT Duel</div>
+    <div class="dTopBar__center" id="prog">1 сұрақ 20 сұрақтан</div>
+    <div class="dTopBar__timer" id="timer">00:20:00</div>
+  </div>
+
+  <div class="dQCard">
+    <div class="dQHeader">
+      <div class="dQTitleRow">
+        <span class="dQNum" id="qNum">Сұрақ 1</span>
+        <span class="dQPts" id="qPts">20 балл</span>
+      </div>
+      <div class="dQTags" id="qTags"></div>
+    </div>
+    <div class="dQText" id="qText"></div>
+    <div class="dOptions" id="qOpts"></div>
+  </div>
+
+  <div class="dNavBar">
+    <div class="dNavRow">
+      <button class="dNavBtn" id="prevBtn" onclick="go(-1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Алдыңғы
+      </button>
+      <button class="dMarkBtn" id="markBtn" onclick="toggleMark()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Белгілеу
+      </button>
+      <button class="dNavBtn" id="nextBtn" onclick="go(1)">
+        Келесі
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="dGrid">
+    <div class="dGrid__title">Сұрақтар</div>
+    <div class="dDots" id="dots"></div>
+  </div>
+
+  <div class="dFinishRow">
+    <button class="dFinishBtn" onclick="finish()">Тестті аяқтау</button>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="project/js/main.js"></script>
+
+<script>
+  const QS = [
+    {id:1, s:'Math',    d:'Орташа', t:'Algebra',       pts:20, text:'Егер 3x + 5 = 20 болса, x мәнін табыңыз.',               opts:['A. 3','B. 5','C. 10','D. 15'],                               ans:1},
+    {id:2, s:'Math',    d:'Оңай',   t:'Algebra',       pts:20, text:'Егер 2x − 4 = 10 болса, x мәнін табыңыз.',               opts:['A. 5','B. 7','C. 3','D. 9'],                                 ans:1},
+    {id:3, s:'Math',    d:'Оңай',   t:'Algebra',       pts:20, text:'Егер x + 12 = 20 болса, x мәнін табыңыз.',               opts:['A. 6','B. 8','C. 10','D. 32'],                               ans:1},
+    {id:4, s:'Math',    d:'Қиын',   t:'Algebra',       pts:20, text:'x² − 5x + 6 = 0 теңдеуінің түбірлері қандай?',           opts:['A. x=1,x=6','B. x=2,x=3','C. x=−2,x=−3','D. x=0,x=5'],   ans:1},
+    {id:5, s:'Math',    d:'Орташа', t:'Geometry',      pts:20, text:'Радиусы 7 см болатын шеңбердің ауданы қандай? (π≈3.14)', opts:['A. 44 см²','B. 153.86 см²','C. 49 см²','D. 21.98 см²'],   ans:1},
+    {id:6, s:'Math',    d:'Оңай',   t:'Geometry',      pts:20, text:'Тіктөртбұрыштың ұзындығы 8, ені 5. Периметрі қанша?',   opts:['A. 40','B. 26','C. 13','D. 20'],                           ans:1},
+    {id:7, s:'Math',    d:'Қиын',   t:'Geometry',      pts:20, text:'Дұрыс үшбұрыштың қабырғасы 6 болса, ауданын табыңыз.',  opts:['A. 9√3','B. 18','C. 12√3','D. 36'],                        ans:0},
+    {id:8, s:'Math',    d:'Орташа', t:'Data Analysis', pts:20, text:'5, 8, 12, 7, 3 сандарының орташа мәнін табыңыз.',        opts:['A. 6','B. 7','C. 8','D. 9'],                               ans:1},
+    {id:9, s:'Math',    d:'Оңай',   t:'Data Analysis', pts:20, text:'4, 4, 6, 8, 10 сандарының медианасы қандай?',            opts:['A. 4','B. 5','C. 6','D. 8'],                               ans:2},
+    {id:10,s:'Reading', d:'Оңай',   t:'Inference',     pts:20, text:'Мәтінде негізгі идея деп нені атаймыз?',                 opts:['A. Кіріспені','B. Авторлық ойды','C. Тұжырымды','D. Мысалды'],ans:1},
+    {id:11,s:'Reading', d:'Орташа', t:'Inference',     pts:20, text:'"Контекст" дегеніміз не?',                               opts:['A. Оқиға','B. Мәтін мазмұны','C. Жалғас сөздер','D. Автор'],ans:1},
+    {id:12,s:'Writing', d:'Оңай',   t:'Grammar',       pts:20, text:'Жазба жұмысында "тезис" дегеніміз не?',                 opts:['A. Мысал','B. Басты пікір','C. Кіріспе сөйлем','D. Қорытынды'],ans:1},
+    {id:13,s:'Math',    d:'Орташа', t:'Algebra',       pts:20, text:'4x − 3 = 13 болса, x қанша?',                           opts:['A. 3','B. 4','C. 5','D. 6'],                               ans:1},
+    {id:14,s:'Math',    d:'Қиын',   t:'Algebra',       pts:20, text:'2x² + 3x − 2 = 0 теңдеуін шешіңіз.',                    opts:['A. x=½,x=−2','B. x=1,x=−2','C. x=2,x=−1','D. x=½,x=2'],  ans:0},
+    {id:15,s:'Math',    d:'Орташа', t:'Data Analysis', pts:20, text:'Орта мән 10, медиана 8. Деректер жиынтығы қандай?',      opts:['A. Оң ауытқу','B. Теріс ауытқу','C. Симметриялы','D. Анықталмайды'],ans:0},
+    {id:16,s:'Reading', d:'Қиын',   t:'Inference',     pts:20, text:'Автор мәтінде не дәлелдегісі келеді?',                  opts:['A. Фактілерді','B. Өз пікірін','C. Оқиғаны','D. Тарихты'], ans:1},
+    {id:17,s:'Writing', d:'Орташа', t:'Grammar',       pts:20, text:'Жай сөйлем мен күрделі сөйлемнің айырмашылығы неде?',   opts:['A. Ұзындықта','B. Предикаттар санында','C. Сөз тәртібінде','D. Тыныс белгілерінде'],ans:1},
+    {id:18,s:'Writing', d:'Оңай',   t:'Grammar',       pts:20, text:'Үтірдің қолданылу ережесі қайсысы дұрыс?',              opts:['A. Ешқашан','B. Жалғаулықтар алдында','C. Жай сөйлемде','D. Соңында'],ans:1},
+    {id:19,s:'Math',    d:'Оңай',   t:'Geometry',      pts:20, text:'Квадраттың қабырғасы 9. Ауданы қанша?',                 opts:['A. 18','B. 36','C. 81','D. 64'],                           ans:2},
+    {id:20,s:'Math',    d:'Орташа', t:'Algebra',       pts:20, text:'Егер f(x) = 2x + 1 болса, f(5) = ?',                    opts:['A. 9','B. 10','C. 11','D. 12'],                            ans:2},
+  ];
+
+  let cur=0, secs=1200, tid;
+  const answers=new Array(QS.length).fill(null);
+  const marked=new Array(QS.length).fill(false);
+
+  function fmt(s){
+    const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;
+    return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
+  }
+
+  function startTimer(){
+    const el=document.getElementById('timer');
+    tid=setInterval(()=>{
+      secs--;
+      el.textContent=fmt(secs);
+      if(secs<=120)el.classList.add('urgent');
+      if(secs<=0){clearInterval(tid); finish();}
+    },1000);
+  }
+
+  function render(){
+    const q=QS[cur];
+    document.getElementById('qNum').textContent=`Сұрақ ${cur+1}`;
+    document.getElementById('qPts').textContent=`${q.pts} балл`;
+    document.getElementById('qText').textContent=q.text;
+    document.getElementById('prog').textContent=`${cur+1} сұрақ ${QS.length} сұрақтан`;
+    document.getElementById('qTags').innerHTML=`<span class="dTag">${q.s}</span><span class="dTag">${q.d}</span><span class="dTag">${q.t}</span>`;
+    document.getElementById('qOpts').innerHTML=q.opts.map((o,i)=>`<button class="dOption${answers[cur]===i?' sel':''}" onclick="pick(${i})">${o}</button>`).join('');
+    document.getElementById('prevBtn').disabled=cur===0;
+    document.getElementById('nextBtn').disabled=cur===QS.length-1;
+    document.getElementById('markBtn').classList.toggle('marked',marked[cur]);
+    renderDots();
+  }
+
+  function renderDots(){
+    document.getElementById('dots').innerHTML=QS.map((_,i)=>{
+      let c='dDot';
+      if(i===cur)c+=' cur';
+      else if(marked[i])c+=' mrk';
+      else if(answers[i]!==null)c+=' ans';
+      return`<button class="${c}" onclick="jump(${i})">${i+1}</button>`;
+    }).join('');
+  }
+
+  function pick(i){answers[cur]=i; render();}
+  function go(d){const n=cur+d; if(n<0||n>=QS.length)return; cur=n; render();}
+  function jump(i){cur=i; render();}
+  function toggleMark(){marked[cur]=!marked[cur]; render();}
+
+  function finish(){
+    clearInterval(tid);
+    const correct=answers.filter((a,i)=>a===QS[i].ans).length;
+    const score=correct*20;
+    const elapsed=Math.round((1200-secs)/60);
+    const oppC=Math.floor(Math.random()*5)+14;
+    const opp=localStorage.getItem('duelOpponent')||'Almaz Talgatuly';
+    const uu=JSON.parse(localStorage.getItem('satifyUser')||'{}');
+    localStorage.setItem('duelResult',JSON.stringify({
+      p1:{name:uu.name||'Sultan Bazarbaiuly',correct,score,time:elapsed},
+      p2:{name:opp,correct:oppC,score:oppC*20,time:Math.floor(Math.random()*15)+20},
+      answers,questions:QS
+    }));
+    window.location.href='duelresult.html';
+  }
+
+  render();
+  startTimer();
+</script>
+</body>
+</html>
