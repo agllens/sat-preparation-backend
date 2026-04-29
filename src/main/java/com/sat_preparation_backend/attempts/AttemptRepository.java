@@ -10,4 +10,6 @@ public interface AttemptRepository extends JpaRepository<Attempt, Long> {
     List<Attempt> findByUser(User user);
 
     List<Attempt> findByUserOrderByCreatedAtDesc(User user);
+
+    List<Attempt> findByUserOrderByCreatedAtAsc(User user);
 }

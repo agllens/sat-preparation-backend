@@ -23,9 +23,9 @@ public class AnalyticsService {
 
 //    public AnalyticsResponse getAnalytics(User user) {
 //
-////        if (!subscriptionService.hasActiveSubscription(user)) {
-////            throw new SubscriptionRequiredException();
-////        }
+    ////        if (!subscriptionService.hasActiveSubscription(user)) {
+    ////            throw new SubscriptionRequiredException();
+    ////        }
 //
 //        List<TestAttempt> attempts = testRepository.findByUser(user);
 //
@@ -86,4 +86,7 @@ public class AnalyticsService {
         return attempts.get(0).getSatScore();
     }
 
+    public List<Attempt> getUserAttempts(User user) {
+        return attemptRepository.findByUserOrderByCreatedAtAsc(user);
+    }
 }

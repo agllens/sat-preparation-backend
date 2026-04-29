@@ -1,19 +1,17 @@
-package com.sat_preparation_backend.analytics;
+package com.sat_preparation_backend.attempts;
 
-import com.sat_preparation_backend.attempts.Attempt;
-import com.sat_preparation_backend.attempts.AttemptRequest;
+import com.sat_preparation_backend.analytics.AnalyticsService;
 import com.sat_preparation_backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/attempts")
 @RequiredArgsConstructor
-public class AnalyticsController {
+public class AttemptController {
 
     private final AnalyticsService analyticsService;
 
@@ -34,4 +32,12 @@ public class AnalyticsController {
         var attempts = analyticsService.getLatestScore(user);
         return ResponseEntity.ok(attempts);
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyAttempts(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(analyticsService.getUserAttempts(user));
+    }
+
 }

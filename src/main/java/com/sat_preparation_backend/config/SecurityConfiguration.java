@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,11 +20,11 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
@@ -31,22 +32,42 @@ public class SecurityConfiguration {
         http
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/**").permitAll()
+
+                        // 🔓 AUTH (регистрация / логин)
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // 🔓 статика (html, css, js)
+                        .requestMatchers(
+                                "/", "/index.html",
+                                "/**/*.html",
+                                "/**/*.css",
+                                "/**/*.js"
+                        ).permitAll()
+
+                        // 👤 USER endpoints
+                        .requestMatchers("/api/v1/attempts/**").authenticated()
+                        .requestMatchers("/api/v1/duel/**").authenticated()
+
+                        // 🔐 ADMIN endpoints
+                        .requestMatchers("/api/v1/tests/**").hasRole("ADMIN")
+
+                        // всё остальное
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                //jwtAuth filter is before username and password auth filter
 
         return http.build();
     }
 
-    // 🔥 CORS Configuration Bean
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
