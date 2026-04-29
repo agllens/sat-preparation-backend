@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SATify — Практикалық жұмыс</title>
+
+  <!-- Your main global styles (header/footer etc.) -->
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    /* =========================
+       PRACTICE PAGE (FINAL UXUI)
+       ========================= */
+
+    :root{
+      --p-bg:#f4f5f8;
+      --p-card:#ffffff;
+
+      /* softer, bluish borders like Figma */
+      --p-border: rgba(29,59,230,0.08);
+      --p-border-soft: rgba(29,59,230,0.05);
+
+      --p-text:#111318;
+      --p-muted:#6b7280;
+      --p-blue:#1d3be6;
+      --p-blue-light:#eef1fd;
+      --p-blue-hover:#1430d6;
+
+      --p-correct:#16a34a;
+      --p-correct-bg:#f0fdf4;
+      --p-wrong:#dc2626;
+      --p-wrong-bg:#fef2f2;
+
+      --p-radius:22px;
+      --p-radius-sm:12px;
+    }
+
+    body{
+      background: var(--p-bg);
+    }
+
+    .practiceWrap{
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 36px 48px 80px;
+    }
+
+    .practiceLayout{
+      display:grid;
+      grid-template-columns: 520px 1fr;
+      gap: 44px;
+      align-items:start;
+    }
+
+    /* ---------- Shared card look (almost no borders, more shadow) ---------- */
+    .pSurface{
+      border: 1px solid var(--p-border-soft);
+      border-radius: var(--p-radius);
+      background: var(--p-card);
+      position: relative;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.04),
+        0 18px 44px rgba(17,17,17,0.06);
+    }
+
+    /* soft inner highlight */
+    .pSurface::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: inherit;
+      pointer-events:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+
+    /* subtle bluish glow */
+    .pSurface::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: inherit;
+      pointer-events:none;
+      background: radial-gradient(700px 520px at 50% 38%,
+        rgba(29,59,230,0.08) 0%,
+        rgba(29,59,230,0.03) 45%,
+        rgba(255,255,255,0) 78%);
+      opacity: 0.9;
+    }
+
+    /* LEFT FILTER CARD */
+    .pFilter{
+      padding: 34px 34px 28px;
+      position: sticky;
+      top: 18px;
+      min-height: 760px;
+    }
+
+    .pFilterTopIcon{
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      border: 2px solid rgba(29,59,230,0.25);
+      background: rgba(29,59,230,0.06);
+      display:grid;
+      place-items:center;
+      color: var(--p-blue);
+      cursor:pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      position: relative;
+      z-index: 2;
+    }
+    .pFilterTopIcon:hover{
+      background: rgba(29,59,230,0.10);
+      border-color: rgba(29,59,230,0.35);
+      transform: translateY(-1px);
+    }
+
+    /* YOUR sizes/weights (kept) */
+    .pFilterTitle{
+      margin-top: 18px;
+      font-size: 46px;
+      line-height: 1.02;
+      font-weight: 500;
+      color: var(--p-text);
+      letter-spacing: -0.8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pGroup{
+      margin-top: 26px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pGroupTitle{
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--p-text);
+      margin-bottom: 12px;
+    }
+
+    .pCheck{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      padding: 8px 4px;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .pCheck input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .pBox{
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid rgba(17,17,17,0.25);
+      background:#fff;
+      display:grid;
+      place-items:center;
+      transition: all 160ms ease;
+      flex-shrink:0;
+    }
+
+    .pCheckText{
+      font-size: 18px;
+      font-weight: 350;
+      color: var(--p-text);
+    }
+
+    .pCheck input:checked + .pBox{
+      border-color: rgba(29,59,230,0.75);
+      background: rgba(29,59,230,0.10);
+    }
+
+    .pBox svg{
+      opacity:0;
+      transform: scale(0.8);
+      transition: all 160ms ease;
+    }
+
+    .pCheck input:checked + .pBox svg{
+      opacity:1;
+      transform: scale(1);
+    }
+
+    .pFilterBottom{
+      margin-top: 26px;
+      display:flex;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pApply{
+      width: 170px;
+      height: 54px;
+      border-radius: 12px;
+      border: 2px solid var(--p-blue);
+      background:#fff;
+      color: var(--p-blue);
+      font-size: 18px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: background 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .pApply:hover{
+      background: rgba(29,59,230,0.06);
+      transform: translateY(-1px);
+    }
+    .pApply:active{
+      transform: translateY(0);
+      box-shadow: 0 10px 22px rgba(29,59,230,0.16);
+    }
+
+    /* RIGHT */
+    .pMain{
+      padding-top: 6px;
+    }
+
+    .pTopBar{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      padding: 16px 18px;
+      margin-bottom: 22px;
+      animation: pSlideDown .25s ease;
+    }
+
+    .pTopBarCount{
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--p-muted);
+      position: relative;
+      z-index: 2;
+    }
+    .pTopBarCount b{
+      color: var(--p-blue);
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .pScorePill{
+      margin-left:auto;
+      height: 30px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--p-blue-light);
+      color: var(--p-blue);
+      font-size: 13px;
+      font-weight: 800;
+      display:inline-flex;
+      align-items:center;
+      white-space:nowrap;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pList{
+      display:flex;
+      flex-direction:column;
+      gap: 22px;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .pList.is-updating{
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events:none;
+    }
+
+    /* QUESTION CARD */
+    .pCard{
+      padding: 30px 32px;
+      animation: pFadeUp .35s ease both;
+    }
+
+    @keyframes pFadeUp{
+      from{ opacity:0; transform: translateY(16px); }
+      to  { opacity:1; transform: translateY(0); }
+    }
+    @keyframes pSlideDown{
+      from{ opacity:0; transform: translateY(-8px); }
+      to  { opacity:1; transform: translateY(0); }
+    }
+
+    .pCardTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* YOUR sizes/weights (kept) */
+    .pCardTitle{
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: -0.4px;
+      color: var(--p-text);
+      line-height: 1.1;
+    }
+
+    .pTags{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+      flex-shrink:0;
+      margin-top: 4px;
+    }
+
+    .pTag{
+      height: 34px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(29,59,230,0.10);
+      color: rgba(17,17,17,0.75);
+      font-size: 15px;
+      font-weight: 650;
+      display:inline-flex;
+      align-items:center;
+    }
+
+    /* YOUR sizes/weights (kept) */
+    .pQuestion{
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--p-text);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pOptions{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pOption{
+      height: 58px;
+      width: 100%;
+      border-radius: 12px;
+
+      /* softer border like Figma */
+      border: 1.5px solid rgba(29,59,230,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+
+      background:#fff;
+      padding: 0 18px;
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      cursor:pointer;
+      text-align:left;
+      transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
+      font-size: 18px;
+      font-weight: 650;
+      color: rgba(17,17,17,0.85);
+    }
+
+    .pOption:hover:not(:disabled){
+      border-color: rgba(29,59,230,0.18);
+      background: rgba(29,59,230,0.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.85),
+        0 10px 24px rgba(29,59,230,0.08);
+      transform: translateY(-1px);
+    }
+
+    .pOption:active:not(:disabled){ transform: translateY(0); }
+
+    .pOption.is-selected{
+      border-color: rgba(29,59,230,0.35);
+      background: rgba(29,59,230,0.08);
+      font-weight: 750;
+    }
+
+    .pOption.is-correct{
+      border-color: var(--p-correct);
+      background: var(--p-correct-bg);
+      color: var(--p-correct);
+      font-weight: 850;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .pOption.is-wrong{
+      border-color: var(--p-wrong);
+      background: var(--p-wrong-bg);
+      color: var(--p-wrong);
+      font-weight: 850;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .pOption:disabled{
+      cursor: not-allowed;
+      transform:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .pOptLabel{
+      min-width: 36px;
+      font-weight: 850;
+      color: rgba(17,17,17,0.6);
+    }
+
+    .pOptIcon{
+      margin-left:auto;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .pCheckBtn{
+      margin-top: 14px;
+      height: 44px;
+      padding: 0 22px;
+      border-radius: 12px;
+      border: none;
+      background: var(--p-blue);
+      color:#fff;
+      font-size: 15px;
+      font-weight: 850;
+      cursor:pointer;
+      transition: background .2s, transform .12s, opacity .2s;
+      opacity: 0;
+      pointer-events:none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pCheckBtn.is-visible{
+      opacity: 1;
+      pointer-events:auto;
+    }
+
+    .pCheckBtn:hover{ background: var(--p-blue-hover); }
+    .pCheckBtn:active{ transform: scale(0.98); }
+
+    .pFeedback{
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 750;
+      display:none;
+      animation: pSlideDown .2s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pFeedback.is-correct{
+      display:block;
+      background: var(--p-correct-bg);
+      color: var(--p-correct);
+    }
+    .pFeedback.is-wrong{
+      display:block;
+      background: var(--p-wrong-bg);
+      color: var(--p-wrong);
+    }
+
+    .pEmpty{
+      padding: 60px 40px;
+      text-align:center;
+      color: var(--p-muted);
+      animation: pFadeUp .3s ease;
+    }
+    .pEmpty h3{
+      font-size: 22px;
+      font-weight: 850;
+      color: var(--p-text);
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 2;
+    }
+    .pEmpty p{
+      font-size: 16px;
+      font-weight: 650;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 1100px){
+      .practiceWrap{ padding: 26px 24px 70px; }
+      .practiceLayout{ grid-template-columns: 1fr; gap: 22px; }
+      .pFilter{ position: relative; top:auto; min-height: unset; }
+    }
+  </style>
+</head>
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float { bottom: 20px; right: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before { animation: none; }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 10h8M8 13.5h5"/>
+    </svg>
+  </a>
+</div>
+<body>
+  <!-- Injected header -->
+  <div id="header-mount"></div>
+
+  <div class="practiceWrap">
+    <div class="practiceLayout">
+
+      <!-- FILTER -->
+      <aside class="pFilter pSurface" id="pFilter">
+        <button class="pFilterTopIcon" type="button" aria-label="menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="6" y="5" width="12" height="2.2" rx="1.1" fill="currentColor"/>
+            <rect x="6" y="11" width="12" height="2.2" rx="1.1" fill="currentColor"/>
+            <rect x="6" y="17" width="10" height="2.2" rx="1.1" fill="currentColor"/>
+          </svg>
+        </button>
+
+        <div class="pFilterTitle">Фильтр</div>
+
+        <div class="pGroup">
+          <div class="pGroupTitle">Бөлім:</div>
+
+          <label class="pCheck">
+            <input type="checkbox" name="subject" value="Math" checked>
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Math</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="subject" value="Reading">
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Reading</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="subject" value="Writing">
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Writing</span>
+          </label>
+        </div>
+
+        <div class="pGroup">
+          <div class="pGroupTitle">Қиындық деңгейі:</div>
+
+          <label class="pCheck">
+            <input type="checkbox" name="difficulty" value="Оңай" checked>
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Оңай</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="difficulty" value="Орташа" checked>
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Орташа</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="difficulty" value="Қиын">
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Қиын</span>
+          </label>
+        </div>
+
+        <div class="pGroup">
+          <div class="pGroupTitle">Сұрақ түрі:</div>
+
+          <label class="pCheck">
+            <input type="checkbox" name="type" value="Algebra" checked>
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Algebra</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="type" value="Geometry">
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Geometry</span>
+          </label>
+
+          <label class="pCheck">
+            <input type="checkbox" name="type" value="Data Analysis">
+            <span class="pBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" stroke="#1d3be6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="pCheckText">Data Analysis</span>
+          </label>
+        </div>
+
+        <div class="pFilterBottom">
+          <button class="pApply" id="applyBtn" type="button">Қабылдау</button>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="pMain">
+        <div class="pTopBar pSurface" id="resultsBar">
+          <div class="pTopBarCount"><b id="resultsCount">0</b> сұрақ табылды</div>
+          <div class="pScorePill" id="scorePill">0 / 0 дұрыс</div>
+        </div>
+
+        <div id="questionList" class="pList"></div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Injected footer -->
+  <div id="footer-mount"></div>
+
+  <!-- loader (header/footer) -->
+  <script src="project/js/main.js"></script>
+
+  <script>
+    /* =========================
+       QUIZ LOGIC (CLEAN + WORKING)
+       ========================= */
+
+    const QUESTIONS = [
+      { id: 1,  subject:'Math',    difficulty:'Орташа', type:'Algebra',       text:'Егер 3x + 5 = 20 болса, x мәнін табыңыз.', options:['A. 3','A. 5','A. 10','A. 15'], answer:1 },
+      { id: 2,  subject:'Math',    difficulty:'Оңай',   type:'Algebra',       text:'Егер 2x − 4 = 10 болса, x мәнін табыңыз.', options:['A. 5','A. 7','A. 3','A. 9'],  answer:1 },
+      { id: 3,  subject:'Math',    difficulty:'Оңай',   type:'Algebra',       text:'Егер x + 12 = 20 болса, x мәнін табыңыз.', options:['A. 6','A. 8','A. 10','A. 32'], answer:1 },
+      { id: 4,  subject:'Math',    difficulty:'Қиын',   type:'Algebra',       text:'x² − 5x + 6 = 0 теңдеуінің түбірлері қандай?', options:['A. x=1, x=6','A. x=2, x=3','A. x=−2, x=−3','A. x=0, x=5'], answer:1 },
+      { id: 5,  subject:'Math',    difficulty:'Орташа', type:'Geometry',      text:'Радиусы 7 см болатын шеңбердің ауданы қандай? (π ≈ 3.14)', options:['A. 44 см²','A. 153.86 см²','A. 49 см²','A. 21.98 см²'], answer:1 },
+      { id: 6,  subject:'Math',    difficulty:'Оңай',   type:'Geometry',      text:'Тіктөртбұрыштың ұзындығы 8, ені 5. Периметрі қанша?', options:['A. 40','A. 26','A. 13','A. 20'], answer:1 },
+      { id: 7,  subject:'Math',    difficulty:'Қиын',   type:'Geometry',      text:'Дұрыс үшбұрыштың қабырғасы 6 болса, ауданын табыңыз.', options:['A. 9√3','A. 18','A. 12√3','A. 36'], answer:0 },
+      { id: 8,  subject:'Math',    difficulty:'Орташа', type:'Data Analysis', text:'5, 8, 12, 7, 3 сандарының орташа мәнін табыңыз.', options:['A. 6','A. 7','A. 8','A. 9'], answer:1 },
+      { id: 9,  subject:'Math',    difficulty:'Оңай',   type:'Data Analysis', text:'4, 4, 6, 8, 10 сандарының медианасы қандай?', options:['A. 4','A. 5','A. 6','A. 8'], answer:2 },
+      { id: 10, subject:'Reading', difficulty:'Оңай',   type:'Algebra',       text:'Мәтінде негізгі идея деп нені атаймыз?', options:['A. Кіріспені','A. Авторлық ойды','A. Тұжырымды','A. Мысалды'], answer:1 },
+      { id: 11, subject:'Reading', difficulty:'Орташа', type:'Algebra',       text:'"Контекст" дегеніміз не?', options:['A. Оқиға','A. Мәтін мазмұны','A. Жалғас сөздер','A. Автор'], answer:1 },
+      { id: 12, subject:'Writing', difficulty:'Оңай',   type:'Algebra',       text:'Жазба жұмысында "тезис" дегеніміз не?', options:['A. Мысал','A. Басты пікір','A. Кіріспе сөйлем','A. Қорытынды'], answer:1 },
+    ];
+
+    // answered[qid] = true/false
+    // answered[qid + "_selected"] = selected option index
+    const answered = {};
+
+    const listEl = document.getElementById('questionList');
+    const resultsCountEl = document.getElementById('resultsCount');
+    const scorePillEl = document.getElementById('scorePill');
+    const applyBtn = document.getElementById('applyBtn');
+
+    function getFilters(){
+      const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(e=>e.value);
+      const difficulties = [...document.querySelectorAll('input[name="difficulty"]:checked')].map(e=>e.value);
+      const types = [...document.querySelectorAll('input[name="type"]:checked')].map(e=>e.value);
+      return { subjects, difficulties, types };
+    }
+
+    function filterQuestions(f){
+      return QUESTIONS.filter(q =>
+        (f.subjects.length ? f.subjects.includes(q.subject) : true) &&
+        (f.difficulties.length ? f.difficulties.includes(q.difficulty) : true) &&
+        (f.types.length ? f.types.includes(q.type) : true)
+      );
+    }
+
+    function updateScore(visible){
+      const answeredCount = visible.filter(q => answered[q.id] !== undefined).length;
+      const correctCount = visible.filter(q => answered[q.id] === true).length;
+      scorePillEl.textContent = `${correctCount} / ${answeredCount} дұрыс`;
+    }
+
+    function smoothRerenderStart(){
+      listEl.classList.add('is-updating');
+    }
+    function smoothRerenderEnd(){
+      requestAnimationFrame(() => listEl.classList.remove('is-updating'));
+    }
+
+    function renderQuestions(visible){
+      resultsCountEl.textContent = visible.length;
+      updateScore(visible);
+
+      if(!visible.length){
+        listEl.innerHTML = `
+          <div class="pSurface pEmpty">
+            <h3>Сұрақ табылмады</h3>
+            <p>Фильтрді өзгертіп, қайта көріңіз.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = visible.map((q, idx) => {
+        const isAnswered = answered[q.id] !== undefined;
+        const wasCorrect = answered[q.id] === true;
+        const selectedIdx = answered[q.id + '_selected'];
+
+        const optionsHtml = q.options.map((opt, i) => {
+          let cls = 'pOption';
+          let icon = '';
+
+          if(!isAnswered && selectedIdx === i) cls += ' is-selected';
+
+          if(isAnswered){
+            if(i === q.answer){ cls += ' is-correct'; icon = `<span class="pOptIcon">✓</span>`; }
+            else if(selectedIdx === i){ cls += ' is-wrong'; icon = `<span class="pOptIcon">✗</span>`; }
+          }
+
+          const cleanText = opt.replace(/^[A-D]\.\s*/,''); // removes "A. "
+          return `
+            <button class="${cls}" data-qid="${q.id}" data-idx="${i}" ${isAnswered ? 'disabled' : ''} type="button">
+              <span class="pOptLabel">${String.fromCharCode(65 + i)}.</span>
+              <span>${cleanText}</span>
+              ${icon}
+            </button>
+          `;
+        }).join('');
+
+        const feedbackHtml = isAnswered
+          ? `<div class="pFeedback ${wasCorrect ? 'is-correct' : 'is-wrong'}">
+               ${wasCorrect ? '✓ Дұрыс жауап!' : '✗ Қате. Дұрыс жауап: ' + q.options[q.answer]}
+             </div>`
+          : `<div class="pFeedback"></div>`;
+
+        return `
+          <section class="pSurface pCard" style="animation-delay:${idx * 0.06}s">
+            <div class="pCardTop">
+              <div class="pCardTitle">Сұрақ ${idx + 1}</div>
+              <div class="pTags">
+                <span class="pTag">${q.subject}</span>
+                <span class="pTag">${q.difficulty}</span>
+                <span class="pTag">${q.type}</span>
+              </div>
+            </div>
+
+            <div class="pQuestion">${q.text}</div>
+
+            <div class="pOptions" data-qwrap="${q.id}">
+              ${optionsHtml}
+            </div>
+
+            <button class="pCheckBtn" id="check-${q.id}" data-qid="${q.id}" type="button">Тексеру</button>
+
+            ${feedbackHtml}
+          </section>
+        `;
+      }).join('');
+
+      // option click: highlight + show check button
+      listEl.querySelectorAll('.pOption:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const qid = Number(btn.dataset.qid);
+          const idx = Number(btn.dataset.idx);
+
+          answered[qid + '_selected'] = idx;
+
+          const wrap = listEl.querySelector(`[data-qwrap="${qid}"]`);
+          wrap.querySelectorAll('.pOption').forEach(b => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+
+          const checkBtn = document.getElementById(`check-${qid}`);
+          checkBtn.classList.add('is-visible');
+        });
+      });
+
+      // check button click: lock + show correct/wrong
+      listEl.querySelectorAll('.pCheckBtn').forEach(btn => {
+        const qid = Number(btn.dataset.qid);
+
+        if(answered[qid] !== undefined){
+          btn.style.display = 'none';
+          return;
+        }
+
+        btn.addEventListener('click', () => {
+          const selectedIdx = answered[qid + '_selected'];
+          if(selectedIdx === undefined) return;
+
+          const q = QUESTIONS.find(x => x.id === qid);
+          answered[qid] = (selectedIdx === q.answer);
+
+          const visible = filterQuestions(getFilters());
+
+          smoothRerenderStart();
+          setTimeout(() => {
+            renderQuestions(visible);
+            smoothRerenderEnd();
+          }, 140);
+        });
+      });
+    }
+
+    function applyFilters(){
+      const visible = filterQuestions(getFilters());
+      smoothRerenderStart();
+      setTimeout(() => {
+        renderQuestions(visible);
+        smoothRerenderEnd();
+      }, 140);
+    }
+
+    applyBtn.addEventListener('click', applyFilters);
+
+    // initial render
+    applyFilters();
+  </script>
+</body>
+</html>

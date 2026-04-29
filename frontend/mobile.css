@@ -1,0 +1,735 @@
+/* ===============================================================
+   MOBILE.CSS вЂ” SATify Responsive Styles
+   Include this after style.css on every page.
+   Breakpoints: 900px (tablet), 680px (large phone), 420px (small phone)
+   =============================================================== */
+
+/* ============================
+   HEADER вЂ” Hamburger Nav
+   ============================ */
+
+.site-header {
+  position: relative;   /* needed so mobile nav dropdown is positioned correctly */
+  z-index: 200;
+}
+
+.site-header__hamburger {
+  display: none;
+  background: none;
+  border: 2px solid rgba(29, 59, 230, 0.18);
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  color: #1d3be6;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.site-header__hamburger:hover {
+  background: rgba(29, 59, 230, 0.06);
+  border-color: rgba(29, 59, 230, 0.32);
+}
+.site-header__hamburger svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+/* в”Ђв”Ђ Mid-desktop: shrink header before hamburger kicks in в”Ђв”Ђ */
+@media (max-width: 1200px) {
+  .site-header__container {
+    padding: 20px 40px;
+    gap: 28px;
+  }
+
+  .site-header__nav {
+    gap: 32px;
+  }
+
+  .site-header__link {
+    font-size: 15px;
+  }
+
+  .site-header__loginBtn {
+    padding: 12px 26px;
+    font-size: 15px;
+  }
+
+  .site-header__logo {
+    height: 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header__container {
+    padding: 14px 20px;
+  }
+
+  .site-header__nav {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
+    padding: 8px 0 16px;
+    z-index: 199;
+  }
+
+  .site-header__nav.is-open {
+    display: flex;
+  }
+
+  .site-header__link {
+    padding: 14px 24px;
+    font-size: 17px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: block;
+  }
+  .site-header__link:last-child {
+    border-bottom: none;
+  }
+
+  .site-header__hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .site-header__logo {
+    height: 32px;
+  }
+
+  .site-header__loginBtn {
+    padding: 10px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+}
+
+
+/* ============================
+   HERO SECTION
+   ============================ */
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding-top: 28px;
+    padding-bottom: 24px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+    margin-top: 12px;
+    margin-bottom: 14px;
+    padding: 0 20px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .scores-area {
+    height: 220px;
+    margin: 20px auto 18px;
+    max-width: calc(100% - 32px);
+    border-radius: 20px;
+  }
+
+  /* Scale down bubble pills */
+  .bubble.score {
+    height: 46px !important;
+    padding: 0 20px !important;
+    font-size: 20px !important;
+  }
+
+  /* Scale down avatar circles */
+  .bubble.avatar {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .bubble.avatar svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 14px;
+    gap: 12px;
+  }
+
+  .primary,
+  .secondary {
+    width: 100%;
+    max-width: 320px;
+    padding: 14px 24px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 26px;
+  }
+
+  .scores-area {
+    height: 180px;
+    max-width: calc(100% - 24px);
+  }
+
+  /* Simplify scores area on very small screens */
+  .bubble.score {
+    height: 38px !important;
+    padding: 0 14px !important;
+    font-size: 16px !important;
+  }
+
+  .bubble.avatar {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}
+
+
+/* ============================
+   SAT SECTIONS (Cards)
+   ============================ */
+@media (max-width: 900px) {
+  .sat-sections {
+    padding: 56px 16px 64px;
+  }
+
+  .sat-sections__title {
+    font-size: 40px;
+    margin-bottom: 32px;
+  }
+
+  /* Override fixed height вЂ” let content breathe */
+  .sat-card {
+    height: auto !important;
+    min-height: 180px;
+  }
+
+  /* Un-absolute the content so card can auto-size */
+  .sat-card__content {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    padding: 16px 22px 24px;
+  }
+
+  .sat-card__icon {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 22px 0 0 22px;
+  }
+
+  .sat-card__meta {
+    margin-bottom: 8px;
+  }
+
+  .sat-card__heading {
+    font-size: 42px;
+    margin-bottom: 20px;
+  }
+
+  .sat-card__btn {
+    height: 48px;
+    font-size: 16px;
+    padding: 0 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sat-sections__title {
+    font-size: 32px;
+  }
+
+  .sat-card__heading {
+    font-size: 34px;
+  }
+}
+
+
+/* ============================
+   RESULTS CAROUSEL
+   ============================ */
+@media (max-width: 900px) {
+  .results {
+    padding: 56px 0 48px;
+  }
+
+  .results__title {
+    font-size: 40px;
+    margin-bottom: 28px;
+    padding: 0 20px;
+  }
+
+  .results__viewport {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .results__track {
+    gap: 18px;
+  }
+
+  .result-card {
+    min-width: 220px;
+    height: 110px;
+    border-radius: 16px;
+  }
+
+  .result-card__score {
+    font-size: 32px;
+  }
+
+  .result-card__name {
+    font-size: 15px;
+    margin-top: 8px;
+  }
+}
+
+
+/* ============================
+   PRACTICE PAGE
+   ============================ */
+@media (max-width: 900px) {
+  .practiceWrap {
+    padding: 18px 16px 48px !important;
+  }
+
+  .practiceLayout,
+  .practice2__layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .filterCard,
+  .filterCard {
+    position: relative !important;
+    top: auto !important;
+    min-height: auto !important;
+    padding: 22px 20px !important;
+    border-radius: 18px !important;
+  }
+
+  .filterCard__title {
+    font-size: 36px !important;
+  }
+
+  .filterGroup__title {
+    font-size: 20px !important;
+  }
+
+  .checkRow__text {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .qCard {
+    padding: 18px 18px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .qCard__top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .qCard__title {
+    font-size: 22px !important;
+  }
+
+  .qCard__chips {
+    justify-content: flex-start !important;
+  }
+
+  .qCard__qtext {
+    font-size: 17px !important;
+  }
+
+  .optionRow {
+    height: auto !important;
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+  }
+
+  .optionRow__text {
+    font-size: 16px !important;
+  }
+}
+
+
+/* ============================
+   DASHBOARD PAGE
+   ============================ */
+@media (max-width: 900px) {
+  .dWrap {
+    padding: 18px 16px 48px !important;
+  }
+
+  .dPageTitle {
+    font-size: 26px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .dGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dCard {
+    padding: 22px 18px 24px !important;
+    border-radius: 18px !important;
+  }
+}
+
+
+/* ============================
+   FULL TEST PAGE
+   ============================ */
+@media (max-width: 900px) {
+  /* Common test wrapper overrides */
+  .testWrap,
+  .test-wrap {
+    padding: 18px 16px 48px !important;
+  }
+}
+
+
+/* ============================
+   ABOUT PAGE
+   ============================ */
+@media (max-width: 900px) {
+  .about-wrap,
+  .about-hero,
+  [class*="about"] {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+
+/* ============================
+   FOOTER
+   ============================ */
+@media (max-width: 680px) {
+  .site-footer {
+    padding: 36px 0 32px;
+  }
+
+  .site-footer__container {
+    padding: 0 20px !important;
+    row-gap: 32px !important;
+  }
+
+  .site-footer__logo {
+    width: 140px;
+  }
+
+  .site-footer__heading {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .site-footer__link,
+  .site-footer__text {
+    font-size: 16px;
+  }
+
+  .site-footer__ctaTitle {
+    font-size: 19px;
+  }
+
+  .site-footer__ctaSub {
+    font-size: 15px;
+  }
+
+  .site-footer__form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .site-footer__input {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+  }
+
+  .site-footer__btn {
+    width: 100%;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .site-footer__navcols,
+  .site-footer__contactcols {
+    grid-template-columns: 1fr !important;
+    row-gap: 10px !important;
+  }
+
+  .site-footer__social {
+    gap: 20px !important;
+  }
+}
+
+
+/* ============================
+   NAVBAR (old hero nav)
+   ============================ */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .nav-links {
+    display: none !important;
+  }
+
+  .login-btn {
+    padding: 10px 22px;
+    font-size: 16px;
+  }
+}
+
+
+/* ============================
+   TAP TARGET MINIMUM SIZE
+   All clickable elements в‰Ґ 44px
+   ============================ */
+@media (max-width: 900px) {
+  .primary,
+  .secondary,
+  .login-btn,
+  .site-header__loginBtn,
+  .sat-card__btn,
+  .filterCard__applyBtn,
+  .site-footer__btn {
+    min-height: 48px;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation; /* remove 300ms tap delay */
+  }
+}
+
+
+/* ============================
+   TYPOGRAPHY SCALE
+   ============================ */
+@media (max-width: 680px) {
+  /* Prevent text from being too large to read comfortably on phones */
+  .sat-sections__title,
+  .results__title,
+  .filterCard__title {
+    word-break: break-word;
+  }
+}
+
+
+/* ============================
+   PREVENT HORIZONTAL OVERFLOW
+   ============================ */
+body {
+  overflow-x: hidden;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  /* Any fixed-pixel-width containers that could overflow */
+  .site-footer__form {
+    max-width: 100%;
+  }
+}
+
+
+/* ============================
+   DUEL PAGES
+   ============================ */
+
+/* duelmain.html */
+@media (max-width: 680px) {
+  .dMain {
+    padding: 80px 20px 60px !important;
+  }
+  .dMain__title {
+    font-size: 34px !important;
+  }
+  .dMain__desc {
+    font-size: 15px !important;
+    margin-bottom: 32px !important;
+  }
+  .dArena {
+    height: 200px !important;
+  }
+  .dBtns {
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 20px !important;
+  }
+  .dBtn--primary,
+  .dBtn--outline {
+    width: 100% !important;
+    justify-content: center !important;
+    height: 52px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* duelvs.html */
+@media (max-width: 680px) {
+  .vsArena {
+    width: 100% !important;
+    height: 220px !important;
+  }
+  .vsRow {
+    gap: 20px !important;
+  }
+  .vsAvatar {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .vsLabel {
+    font-size: 26px !important;
+  }
+  .dMain__title {
+    font-size: 32px !important;
+  }
+}
+
+/* duelquestion.html */
+@media (max-width: 680px) {
+  .dPage {
+    padding: 90px 16px 60px !important;
+  }
+  .dTopBar {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 16px 18px !important;
+    text-align: center !important;
+  }
+  .dQCard {
+    padding: 20px 18px 22px !important;
+  }
+  .dQHeader {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .dQText {
+    font-size: 16px !important;
+  }
+}
+
+/* duelresult.html */
+@media (max-width: 680px) {
+  .dPage {
+    padding: 80px 16px 60px !important;
+    text-align: center !important;
+  }
+  .dTitle {
+    font-size: 34px !important;
+    margin-bottom: 28px !important;
+  }
+  .dGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* duelend.html */
+@media (max-width: 900px) {
+  .dLayout {
+    grid-template-columns: 1fr !important;
+    padding: 80px 16px 60px !important;
+    gap: 20px !important;
+  }
+  .dSide {
+    position: relative !important;
+    top: auto !important;
+  }
+}
+
+
+/* ============================
+   PROFILE & EDIT PROFILE
+   ============================ */
+@media (max-width: 900px) {
+  /* profile.html */
+  .pWrap,
+  [class*="pWrap"] {
+    padding: 24px 16px 60px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  /* profile grid: 2fr 1fr в†’ single column */
+  .pGrid,
+  [style*="grid-template-columns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* editprofile.html */
+  .eWrap,
+  [class*="eWrap"] {
+    padding: 24px 16px 60px !important;
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================
+   AI CHAT PAGE
+   ============================ */
+@media (max-width: 680px) {
+  /* chat container */
+  .chatWrap,
+  [class*="chatWrap"],
+  [class*="chat-wrap"] {
+    padding: 0 12px !important;
+    max-width: 100% !important;
+  }
+
+  /* message bubbles */
+  [class*="msg"],
+  [class*="bubble"] {
+    max-width: 88% !important;
+  }
+}
+
+
+/* ============================
+   ADMIN PAGE
+   ============================ */
+@media (max-width: 820px) {
+  /* admin tables / grids */
+  [class*="aTable"],
+  [class*="admin-table"] {
+    overflow-x: auto !important;
+    display: block !important;
+  }
+}

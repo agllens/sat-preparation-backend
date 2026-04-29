@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAT Duel — Жауаптарды қарау</title>
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f4f5f8;color:#111318;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* PAGE LAYOUT */
+    .dLayout{flex:1;display:grid;grid-template-columns:300px 1fr;gap:32px;max-width:1300px;margin:0 auto;width:100%;padding:120px 48px 80px;align-items:start;}
+
+    /* SIDEBAR */
+    .dSide{position:sticky;top:100px;background:#fff;border-radius:20px;box-shadow:0 2px 4px rgba(0,0,0,.025),0 14px 38px rgba(17,17,17,.055);padding:28px 28px 32px;}
+    .dSide__icon{width:46px;height:46px;border-radius:14px;background:rgba(29,59,230,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+    .dSide__title{font-size:28px;font-weight:800;color:#111318;margin-bottom:16px;}
+    .dSide__stat{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;margin-bottom:8px;}
+    .dSide__stat--g{color:#22c55e;} 
+    .dSide__stat--r{color:#ef4444;}
+    .dSide__num{font-size:24px;font-weight:800;}
+    .dSide__div{height:1px;background:rgba(17,17,17,.07);margin:20px 0;}
+    .dSide__btn{width:100%;height:46px;background:#1d3be6;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition: filter 150ms;}
+    .dSide__btn:hover{filter:brightness(.9);}
+
+    /* QUESTION LIST */
+    .dQList{display:flex;flex-direction:column;gap:20px;}
+
+    /* REVIEW CARD */
+    .dRevCard{background:#fff;border-radius:20px;border:2px solid rgba(17,17,17,.10);box-shadow:0 2px 4px rgba(0,0,0,.02),0 10px 28px rgba(17,17,17,.05);padding:28px 32px;}
+    .dRevCard.correct{border-color:#22c55e;}
+    .dRevCard.wrong{border-color:#ef4444;}
+    .dRevCard__hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:16px;}
+    .dRevCard__num{font-size:20px;font-weight:800;color:#6b7280;}
+    .dRevCard.correct .dRevCard__num{color:#22c55e;}
+    .dRevCard.wrong .dRevCard__num{color:#ef4444;}
+    .dRevCard__tags{display:flex;gap:8px;}
+    .dTag{height:28px;padding:0 12px;border-radius:999px;border:1px solid rgba(17,17,17,0.13);font-size:13px;font-weight:600;color:rgba(17,17,17,0.70);display:inline-flex;align-items:center;}
+    .dRevCard__text{font-size:16px;font-weight:600;color:#111318;line-height:1.55;margin-bottom:20px;}
+    .dRevOpts{display:flex;flex-direction:column;gap:10px;}
+    .dRevOpt{width:100%;height:52px;border-radius:10px;border:1.5px solid rgba(17,17,17,0.10);background:#fff;display:flex;align-items:center;padding:0 18px;font-size:15px;font-weight:600;color:#111318;}
+    .dRevOpt.is-wrong{border-color:#ef4444;background:rgba(239,68,68,0.06);color:#ef4444;}
+    .dRevOpt.is-correct{border-color:#22c55e;background:rgba(34,197,94,0.07);color:#22c55e;}
+
+    @media(max-width:900px){
+      .dLayout{grid-template-columns:1fr;padding:100px 20px 80px;}
+      .dSide{position:relative;top:0;margin-bottom:24px;}
+    }
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<div class="dLayout">
+  <div class="dSide">
+    <div class="dSide__icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d3be6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11H4a1 1 0 0 0-1 1v6h6V12a1 1 0 0 0-1-1z"/><path d="M14 7h-4a1 1 0 0 0-1 1v11h6V8a1 1 0 0 0-1-1z"/><path d="M19 4h-4a1 1 0 0 0-1 1v14h6V5a1 1 0 0 0-1-1z"/>
+      </svg>
+    </div>
+    <div class="dSide__title">Сұрақтар</div>
+    <div class="dSide__stat dSide__stat--g">Дұрыс: <span class="dSide__num" id="cCnt">—</span></div>
+    <div class="dSide__stat dSide__stat--r">Қате: <span class="dSide__num" id="wCnt">—</span></div>
+    <div class="dSide__div"></div>
+    <button class="dSide__btn" onclick="location.href='duelresult.html'">← Нәтижеге оралу</button>
+  </div>
+
+  <div class="dQList" id="qList"></div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="project/js/main.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const r = JSON.parse(localStorage.getItem('duelResult') || 'null');
+    
+    if(!r) { 
+      window.location.href = 'duelmain.html'; 
+      return;
+    }
+
+    const {answers, questions} = r;
+    let correct = 0, wrong = 0;
+
+    const listHtml = questions.map((q, i) => {
+      const ua = answers[i];
+      const isCorrect = ua === q.ans;
+      const isSkipped = ua === null;
+      
+      if(isCorrect) correct++;
+      else if(!isSkipped) wrong++;
+
+      const statusClass = isSkipped ? '' : (isCorrect ? ' correct' : ' wrong');
+      
+      const optsHtml = (q.opts || q.options).map((o, oi) => {
+        let optClass = 'dRevOpt';
+        if(oi === q.ans) optClass += ' is-correct';
+        else if(oi === ua && !isCorrect) optClass += ' is-wrong';
+        return `<div class="${optClass}">${o}</div>`;
+      }).join('');
+
+      return `
+        <div class="dRevCard ${statusClass}">
+          <div class="dRevCard__hdr">
+            <span class="dRevCard__num">Сұрақ ${i+1}</span>
+            <div class="dRevCard__tags">
+              <span class="dTag">${q.s || q.subject}</span>
+              <span class="dTag">${q.d || q.difficulty}</span>
+              <span class="dTag">${q.t || q.type}</span>
+            </div>
+          </div>
+          <div class="dRevCard__text">${q.text}</div>
+          <div class="dRevOpts">${optsHtml}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('qList').innerHTML = listHtml;
+    document.getElementById('cCnt').textContent = correct;
+    document.getElementById('wCnt').textContent = wrong;
+  });
+</script>
+</body>
+</html>

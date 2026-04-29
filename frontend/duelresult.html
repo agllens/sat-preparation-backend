@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAT Duel — Нәтиже</title>
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f4f5f8;color:#111318;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* PAGE CONTENT */
+    .dPage{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:140px 48px 100px;text-align:center;}
+    .dTitle{font-size:56px;font-weight:800;color:#1d3be6;letter-spacing:-1px;margin-bottom:48px;}
+
+    /* RESULT GRID */
+    .dGrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1100px;margin:0 auto;}
+
+    /* CARD */
+    .dCard{border-radius:22px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.025),0 14px 38px rgba(17,17,17,.055);overflow:hidden;text-align:left;position:relative;}
+    .dCard__top{height:220px;background:linear-gradient(160deg,rgba(29,59,230,.10) 0%,rgba(29,59,230,.04) 60%,transparent 100%);padding:22px 24px;display:flex;align-items:flex-start;}
+    .dCard.winner .dCard__top{background:linear-gradient(160deg,rgba(29,59,230,.18) 0%,rgba(29,59,230,.07) 60%,transparent 100%);}
+    .dCard__icon{width:42px;height:42px;border-radius:12px;background:rgba(29,59,230,.10);display:flex;align-items:center;justify-content:center;}
+    .dCard__badge{position:absolute;top:18px;right:18px;background:#1d3be6;color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:999px;}
+    .dCard__body{padding:22px 28px 28px;}
+    .dCard__stat{font-size:14px;font-weight:600;color:#6b7280;margin-bottom:10px;}
+    .dCard__nameRow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+    .dCard__name{font-size:26px;font-weight:800;color:#111318;letter-spacing:-0.3px;}
+    .dCard__score{font-size:36px;font-weight:800;color:#1d3be6;letter-spacing:-1px;line-height:1;}
+    .dCard__time{font-size:15px;font-weight:600;color:#6b7280;margin-bottom:24px;}
+    .dCard__btn{height:46px;padding:0 24px;border-radius:12px;border:2px solid #1d3be6;background:#fff;color:#1d3be6;font-size:15px;font-weight:700;cursor:pointer;transition:background 150ms;}
+    .dCard__btn:hover{background:rgba(29,59,230,.08);}
+
+    .dActions{margin-top:48px;display:flex;gap:16px;justify-content:center;}
+    .dBtn--primary{height:52px;padding:0 36px;background:#1d3be6;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;transition:all 150ms;}
+    .dBtn--primary:hover{filter:brightness(.9);transform:translateY(-2px);}
+    .dBtn--outline{height:52px;padding:0 36px;background:transparent;color:#1d3be6;border:2px solid #1d3be6;border-radius:14px;font-size:16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;transition:all 150ms;}
+    .dBtn--outline:hover{background:rgba(29,59,230,.08);transform:translateY(-2px);}
+
+    @media(max-width:700px){.dPage{padding:100px 16px 60px;}.dGrid{grid-template-columns:1fr;}.dTitle{font-size:40px;}}
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<div class="dPage">
+  <h1 class="dTitle" id="dTitle">Нәтиже</h1>
+  <div class="dGrid" id="dGrid"></div>
+  <div class="dActions">
+    <a class="dBtn--primary" href="duelmain.html">Қайта ойнау</a>
+    <a class="dBtn--outline" href="dashboard.html">Бақылау тақтасы</a>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script src="project/js/main.js"></script>
+
+<script>
+  // Wait for DOM to ensure localStorage is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    const r = JSON.parse(localStorage.getItem('duelResult') || 'null');
+    
+    if(!r) { 
+      window.location.href = 'duelmain.html'; 
+      return;
+    }
+
+    const {p1, p2} = r;
+    const p1wins = p1.score > p2.score || (p1.score === p2.score && p1.time <= p2.time);
+    document.getElementById('dTitle').textContent = p1wins ? 'Жеңіс!' : 'Жеңіліс...';
+
+    function createCard(pl, isWinner) {
+      return `
+        <div class="dCard ${isWinner ? 'winner' : ''}">
+          <div class="dCard__top">
+            <div class="dCard__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d3be6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11H4a1 1 0 0 0-1 1v6h6V12a1 1 0 0 0-1-1z"/><path d="M14 7h-4a1 1 0 0 0-1 1v11h6V8a1 1 0 0 0-1-1z"/><path d="M19 4h-4a1 1 0 0 0-1 1v14h6V5a1 1 0 0 0-1-1z"/>
+              </svg>
+            </div>
+            ${isWinner ? '<div class="dCard__badge">Жеңімпаз</div>' : ''}
+          </div>
+          <div class="dCard__body">
+            <div class="dCard__stat">Дұрыс сұрақ саны: ${pl.correct}</div>
+            <div class="dCard__nameRow">
+              <span class="dCard__name">${pl.name} —</span>
+              <span class="dCard__score">${pl.score}</span>
+            </div>
+            <div class="dCard__time">Тапсырған уақыты: ${pl.time} минут</div>
+            <button class="dCard__btn" onclick="location.href='duelend.html'">Жауаптарды қарау</button>
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('dGrid').innerHTML = createCard(p1, p1wins) + createCard(p2, !p1wins);
+  });
+</script>
+</body>
+</html>

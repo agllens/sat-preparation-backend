@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAT Mock Tests</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #1d3be6;
+      --bg: #f0f2f8;
+    }
+
+    body {
+      font-family: Inter, 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: #111;
+    }
+
+    /* =====================
+       PAGE
+    ===================== */
+    .page {
+      padding: 40px 40px 80px;
+    }
+
+    /* =====================
+       GRID — 2 cols × 2 rows
+    ===================== */
+    .grid {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    /* =====================
+       CARD — landscape
+    ===================== */
+    .sat-card {
+      position: relative;
+      height: 430px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: transform 240ms ease, box-shadow 240ms ease, background 240ms ease;
+      will-change: transform;
+    }
+
+    /* radial blue glow */
+    .sat-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        520px 360px at 50% 30%,
+        rgba(29,59,230,0.09) 0%,
+        rgba(29,59,230,0.04) 45%,
+        rgba(255,255,255,0) 75%
+      );
+      pointer-events: none;
+    }
+
+    /* inner top highlight */
+    .sat-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      pointer-events: none;
+    }
+
+    .sat-card:hover {
+      box-shadow: 0 18px 46px rgba(29,59,230,0.14);
+      transform: translateY(-6px);
+      background: rgba(255,255,255,0.88);
+    }
+
+    /* =====================
+       ICON BADGE
+    ===================== */
+    .sat-card__icon {
+      position: absolute;
+      top: 26px;
+      left: 26px;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      transition: transform 240ms ease, box-shadow 240ms ease;
+    }
+
+    .sat-card:hover .sat-card__icon {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px rgba(29,59,230,0.18);
+    }
+
+    /* =====================
+       CONTENT (bottom)
+    ===================== */
+    .sat-card__content {
+      position: absolute;
+      left: 36px;
+      right: 36px;
+      bottom: 36px;
+    }
+
+    .sat-card__meta {
+      font-size: 14px;
+      color: rgba(17,17,17,0.55);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .sat-card__heading {
+      font-size: 38px;
+      line-height: 1.05;
+      font-weight: 700;        /* was 800, reduced one step */
+      color: #0b0b0b;
+      margin-bottom: 4px;
+      letter-spacing: -0.4px;
+    }
+
+    .sat-card__sub {
+      font-size: 14px;
+      color: rgba(17,17,17,0.55);
+      font-weight: 400;
+      margin-bottom: 22px;
+    }
+
+    /* =====================
+       BUTTON
+    ===================== */
+    .sat-card__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      padding: 0 28px;
+      border-radius: 12px;
+      border: 1.5px solid var(--blue);
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .sat-card__btn:hover {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(29,59,230,0.22);
+    }
+
+    .sat-card__btn:active  { transform: translateY(1px); }
+
+    .sat-card__btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(29,59,230,0.22);
+    }
+
+    /* =====================
+       REVEAL ANIMATION
+    ===================== */
+    .sat-card--reveal {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    .sat-card--reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sat-card, .sat-card__icon, .sat-card__btn { transition: none !important; }
+      .sat-card--reveal { opacity: 1; transform: none; }
+    }
+
+    /* =====================
+       RESPONSIVE
+    ===================== */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .page { padding: 24px 18px 50px; }
+      .grid { gap: 18px; }
+      .sat-card { height: 380px; }
+      .sat-card__heading { font-size: 30px; }
+      .sat-card__content { left: 24px; right: 24px; bottom: 24px; }
+    }
+  </style>
+</head>
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float { bottom: 20px; right: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before { animation: none; }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 10h8M8 13.5h5"/>
+    </svg>
+  </a>
+</div>
+
+<body>
+
+  <!-- Injected header -->
+  <div id="header-mount"></div>
+
+  <div class="page">
+    <div class="grid">
+
+      <!-- Card 1 -->
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M8 7.5h8M8 11h8M8 14.5h6" stroke="#1d3be6" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8.5 3.5h7l3 3v13a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" stroke="#1d3be6" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">Сұрақ саны: 98</div>
+          <div class="sat-card__heading">SAT Mock Test #1</div>
+          <div class="sat-card__sub">Ұзақтығы: 2 сағат 14 минут</div>
+          <a class="sat-card__btn" href="test-seccions.html">Тест тапсыру</a>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M8 7.5h8M8 11h8M8 14.5h6" stroke="#1d3be6" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8.5 3.5h7l3 3v13a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" stroke="#1d3be6" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">Сұрақ саны: 98</div>
+          <div class="sat-card__heading">SAT Mock Test #2</div>
+          <div class="sat-card__sub">Ұзақтығы: 2 сағат 14 минут</div>
+          <a class="sat-card__btn" href="test-seccions.html">Тест тапсыру</a>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M8 7.5h8M8 11h8M8 14.5h6" stroke="#1d3be6" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8.5 3.5h7l3 3v13a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" stroke="#1d3be6" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">Сұрақ саны: 98</div>
+          <div class="sat-card__heading">SAT Mock Test #3</div>
+          <div class="sat-card__sub">Ұзақтығы: 2 сағат 14 минут</div>
+          <a class="sat-card__btn" href="test-seccions.html">Тест тапсыру</a>
+        </div>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="sat-card sat-card--reveal">
+        <div class="sat-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M8 7.5h8M8 11h8M8 14.5h6" stroke="#1d3be6" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8.5 3.5h7l3 3v13a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2Z" stroke="#1d3be6" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sat-card__content">
+          <div class="sat-card__meta">Сұрақ саны: 98</div>
+          <div class="sat-card__heading">SAT Mock Test #4</div>
+          <div class="sat-card__sub">Ұзақтығы: 2 сағат 14 минут</div>
+          <a class="sat-card__btn" href="test-seccions.html">Тест тапсыру</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <!-- Injected footer -->
+  <div id="footer-mount"></div>
+
+  <script src="project/js/main.js"></script>
+  <script src="project/js/script.js"></script>
+
+  <script>
+    // scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('is-visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.sat-card--reveal').forEach(card => observer.observe(card));
+  </script>
+
+</body>
+</html>

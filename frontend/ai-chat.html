@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SATify — AI Кеңесші</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    :root {
+      --blue: #1d3be6;
+      --blue-light: rgba(29,59,230,0.08);
+      --blue-mid: rgba(29,59,230,0.13);
+      --bg: #f4f5f8;
+      --card: #ffffff;
+      --text: #111318;
+      --muted: #6b7280;
+      --border: rgba(17,17,17,0.09);
+      --radius: 22px;
+      --input-h: 80px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── PAGE SHELL ── */
+    .chat-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── TOP BAR ── */
+    .chat-topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 0 20px;
+      flex-shrink: 0;
+    }
+
+    .chat-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+      flex-shrink: 0;
+    }
+    .chat-back:hover { color: var(--blue); }
+    .chat-back svg { transition: transform 0.15s ease; }
+    .chat-back:hover svg { transform: translateX(-3px); }
+
+    .chat-topbar__info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-topbar__avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-topbar__avatar svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .chat-topbar__name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.2px;
+    }
+
+    .chat-topbar__status {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
+    }
+
+    /* ── SUGGESTIONS ── */
+    .chat-suggestions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-bottom: 18px;
+      flex-shrink: 0;
+    }
+
+    .suggestion-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .suggestion-pill:hover {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    /* ── MESSAGES AREA ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-bottom: 24px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 0; }
+
+    /* date divider */
+    .msg-divider {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 0 4px;
+    }
+
+    /* ── BUBBLE ROW ── */
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: msgIn 0.32s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    @keyframes msgIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-row--user { flex-direction: row-reverse; }
+
+    /* small avatar for assistant */
+    .msg-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .msg-avatar svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .msg-row--user .msg-avatar { display: none; }
+
+    /* bubble */
+    .msg-bubble {
+      max-width: 72%;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    /* assistant bubble */
+    .msg-row--ai .msg-bubble {
+      background: var(--card);
+      color: var(--text);
+      border-bottom-left-radius: 5px;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.025),
+        0 8px 24px rgba(17,17,17,0.05);
+    }
+
+    /* user bubble */
+    .msg-row--user .msg-bubble {
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 6px 20px rgba(29,59,230,0.28);
+    }
+
+    /* ── TYPING INDICATOR ── */
+    .typing-indicator {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .typing-bubble {
+      background: var(--card);
+      padding: 14px 20px;
+      border-radius: 18px;
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.025), 0 8px 24px rgba(17,17,17,0.05);
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(17,17,17,0.25);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.18s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes typingBounce {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── INPUT BAR ── */
+    .chat-inputbar {
+      flex-shrink: 0;
+      padding: 16px 0 32px;
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(transparent, var(--bg) 30%);
+    }
+
+    .chat-inputbar__inner {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 10px 10px 10px 18px;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.03),
+        0 12px 32px rgba(17,17,17,0.07);
+      border: 1.5px solid transparent;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .chat-inputbar__inner:focus-within {
+      border-color: rgba(29,59,230,0.25);
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.03),
+        0 12px 32px rgba(29,59,230,0.10);
+    }
+
+    .chat-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: inherit;
+      resize: none;
+      max-height: 120px;
+      line-height: 1.55;
+      padding: 4px 0;
+    }
+
+    .chat-input::placeholder { color: rgba(107,114,128,0.55); }
+
+    .chat-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--blue);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .chat-send:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .chat-send:not(:disabled):hover { opacity: 0.88; transform: scale(1.06); }
+    .chat-send:not(:disabled):active { transform: scale(0.94); }
+
+    .chat-send svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── HINT ── */
+    .chat-hint {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(107,114,128,0.6);
+      margin-top: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── WELCOME CARD ── */
+    .welcome-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.025), 0 10px 28px rgba(17,17,17,0.05);
+    }
+
+    .welcome-card__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.2px;
+      margin-bottom: 8px;
+    }
+
+    .welcome-card__sub {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .welcome-card__topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 16px;
+    }
+
+    .welcome-topic {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-light);
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .chat-shell { padding: 0 16px; }
+      .msg-bubble { max-width: 88%; font-size: 14px; }
+      .suggestion-pill { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="header-mount"></div>
+
+  <div class="chat-shell">
+
+    <!-- TOP BAR -->
+    <div class="chat-topbar">
+      <a href="index.html" class="chat-back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Артқа
+      </a>
+
+      <div class="chat-topbar__info">
+        <div class="chat-topbar__avatar">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/>
+            <path d="M9 9h1.5M13.5 9H15M9 13.5c.5 1 1.5 1.5 3 1.5s2.5-.5 3-1.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="chat-topbar__name">SATify Кеңесші</div>
+          <div class="chat-topbar__status">
+            <span class="status-dot"></span>
+            Белсенді
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUGGESTIONS -->
+    <div class="chat-suggestions" id="suggestions">
+      <div class="suggestion-pill" onclick="sendSuggestion(this)">Writing-те қалай жақсартамын?</div>
+      <div class="suggestion-pill" onclick="sendSuggestion(this)">Math бойынша кеңес бер</div>
+      <div class="suggestion-pill" onclick="sendSuggestion(this)">1500+ балл алу үшін не керек?</div>
+      <div class="suggestion-pill" onclick="sendSuggestion(this)">Апталық жоспар жаса</div>
+      <div class="suggestion-pill" onclick="sendSuggestion(this)">Reading стратегиясы</div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="chat-messages" id="chatMessages">
+
+      <!-- Welcome card -->
+      <div class="welcome-card">
+        <div class="welcome-card__title">Сәлем, Karakat!</div>
+        <div class="welcome-card__sub">
+          SAT дайындығы бойынша кез келген сұрақты қой — жеке жоспар, тақырып түсіндіру, стратегия. Мен Қазақ тілінде жауап беремін.
+        </div>
+        <div class="welcome-card__topics">
+          <span class="welcome-topic">Reading</span>
+          <span class="welcome-topic">Math</span>
+          <span class="welcome-topic">Writing</span>
+          <span class="welcome-topic">Стратегия</span>
+          <span class="welcome-topic">Жоспар</span>
+        </div>
+      </div>
+
+      <div class="msg-divider">Бүгін</div>
+
+    </div>
+
+    <!-- INPUT BAR -->
+    <div class="chat-inputbar">
+      <div class="chat-inputbar__inner">
+        <textarea
+          class="chat-input"
+          id="chatInput"
+          placeholder="Сұрағыңды жаз..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="chat-send" id="sendBtn" onclick="sendMessage()" disabled>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-hint">Enter — жіберу · Shift+Enter — жаңа жол</div>
+    </div>
+
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script src="project/js/main.js"></script>
+  <script>
+    /* ─────────────────────────────────────────
+       CONFIG
+    ───────────────────────────────────────── */
+    const API_KEY = 'YOUR_API_KEY_HERE'; // ← өз кілтіңді қой
+
+    const SYSTEM_PROMPT = `Сен SATify платформасының SAT дайындық кеңесшісісің. Атың — SATify Кеңесші.
+
+Міндеттерің:
+- SAT емтиханына дайындалатын қазақстандық оқушыларға кеңес беру
+- Reading, Math және Writing бөлімдері бойынша нақты стратегиялар ұсыну
+- Жеке оқу жоспарлары жасау
+- Уәж беру және оқушыны қолдау
+
+Қағидалар:
+- Барлық жауаптарды қазақ тілінде жаз
+- Қысқа, нақты және практикалық кеңестер бер (максимум 3-4 абзац)
+- Нақты мысалдар мен деректер қолдан
+- SAT форматын жақсы білетін маман ретінде жауап бер
+- Emoji қолданба, бірақ жылы және ынталандырушы тонда сөйле
+- Тізім жасағанда нүктемен (•) бастап жаз`;
+
+    /* conversation history */
+    let history = [];
+    let isLoading = false;
+
+    /* ─────────────────────────────────────────
+       UI HELPERS
+    ───────────────────────────────────────── */
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl    = document.getElementById('chatInput');
+    const sendBtn    = document.getElementById('sendBtn');
+
+    inputEl.addEventListener('input', () => {
+      sendBtn.disabled = !inputEl.value.trim() || isLoading;
+    });
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendBtn.disabled) sendMessage();
+      }
+    }
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 50);
+    }
+
+    function appendMessage(role, text) {
+      const row = document.createElement('div');
+      row.className = `msg-row msg-row--${role}`;
+
+      if (role === 'ai') {
+        const av = document.createElement('div');
+        av.className = 'msg-avatar';
+        av.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/><path d="M9 9h1.5M13.5 9H15M9 13.5c.5 1 1.5 1.5 3 1.5s2.5-.5 3-1.5"/></svg>`;
+        row.appendChild(av);
+      }
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = text;
+      row.appendChild(bubble);
+
+      messagesEl.appendChild(row);
+      scrollToBottom();
+      return bubble;
+    }
+
+    function showTyping() {
+      const row = document.createElement('div');
+      row.className = 'typing-indicator';
+      row.id = 'typingIndicator';
+
+      const av = document.createElement('div');
+      av.className = 'msg-avatar';
+      av.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"/><path d="M9 9h1.5M13.5 9H15M9 13.5c.5 1 1.5 1.5 3 1.5s2.5-.5 3-1.5"/></svg>`;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'typing-bubble';
+      bubble.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+
+      row.appendChild(av);
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      const t = document.getElementById('typingIndicator');
+      if (t) t.remove();
+    }
+
+    /* hide suggestions after first message */
+    function hideSuggestions() {
+      const s = document.getElementById('suggestions');
+      if (s) {
+        s.style.transition = 'opacity 0.3s ease, max-height 0.4s ease';
+        s.style.opacity = '0';
+        s.style.maxHeight = '0';
+        s.style.overflow = 'hidden';
+        setTimeout(() => s.remove(), 400);
+      }
+    }
+
+    /* ─────────────────────────────────────────
+       SEND
+    ───────────────────────────────────────── */
+    async function sendMessage(text) {
+      const msg = (text || inputEl.value).trim();
+      if (!msg || isLoading) return;
+
+      hideSuggestions();
+
+      /* clear input */
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      sendBtn.disabled = true;
+      isLoading = true;
+
+      /* show user message */
+      appendMessage('user', msg);
+
+      /* update history */
+      history.push({ role: 'user', content: msg });
+
+      /* show typing */
+      showTyping();
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 1000,
+            system: SYSTEM_PROMPT,
+            messages: history
+          })
+        });
+
+        hideTyping();
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const reply = data.content?.[0]?.text || 'Кешіріңіз, қате шықты. Қайта көріңіз.';
+
+        history.push({ role: 'assistant', content: reply });
+        appendMessage('ai', reply);
+
+      } catch (err) {
+        hideTyping();
+        appendMessage('ai', 'Байланыс қатесі шықты. Интернет байланысын тексеріп, қайта жіберіңіз.');
+        console.error(err);
+      }
+
+      isLoading = false;
+    }
+
+    function sendSuggestion(el) {
+      sendMessage(el.textContent);
+    }
+  </script>
+
+</body>
+</html>

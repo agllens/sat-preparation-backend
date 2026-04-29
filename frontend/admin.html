@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Satify — Әкімші панелі</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    :root {
+      --blue: #1d3be6;
+      --blue-light: rgba(29,59,230,0.08);
+      --bg: #f4f5f8;
+      --card: #ffffff;
+      --text: #111318;
+      --muted: #6b7280;
+      --green: #22c55e;
+      --green-light: rgba(34,197,94,0.10);
+      --red: #ef4444;
+      --red-light: rgba(239,68,68,0.09);
+      --orange: #f97316;
+      --orange-light: rgba(249,115,22,0.09);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --sidebar: 240px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ================================
+       CARD BASE
+    ================================ */
+    .aCard {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.025),
+        0 14px 38px rgba(17,17,17,0.055);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aCard::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    /* ================================
+       LAYOUT — sidebar + main
+    ================================ */
+    .aLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ================================
+       SIDEBAR
+    ================================ */
+    .aSidebar {
+      width: var(--sidebar);
+      background: var(--card);
+      border-right: 1px solid rgba(17,17,17,0.06);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0 24px;
+      z-index: 100;
+    }
+
+    .aSidebar__logo {
+      padding: 0 24px 28px;
+      border-bottom: 1px solid rgba(17,17,17,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .aSidebar__logoMark {
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .aSidebar__logoLabel {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+
+    .aSidebar__nav {
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .aSidebar__item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 140ms ease, color 140ms ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .aSidebar__item svg {
+      flex-shrink: 0;
+      opacity: 0.6;
+      transition: opacity 140ms ease;
+    }
+
+    .aSidebar__item:hover {
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .aSidebar__item:hover svg { opacity: 1; }
+
+    .aSidebar__item.is-active {
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .aSidebar__item.is-active svg { opacity: 1; }
+
+    .aSidebar__bottom {
+      padding: 0 12px;
+    }
+
+    .aSidebar__adminTag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--blue-light);
+    }
+
+    .aSidebar__adminAvatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .aSidebar__adminInfo {
+      min-width: 0;
+    }
+
+    .aSidebar__adminName {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .aSidebar__adminRole {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    /* ================================
+       MAIN AREA
+    ================================ */
+    .aMain {
+      margin-left: var(--sidebar);
+      flex: 1;
+      padding: 44px 48px 100px;
+      min-width: 0;
+    }
+
+    /* ================================
+       PAGE HEADER
+    ================================ */
+    .aPageHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
+
+    .aPageTitle {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .aPageSub {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    /* ================================
+       PRIMARY BUTTON
+    ================================ */
+    .aBtnPrimary {
+      height: 48px;
+      padding: 0 26px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: filter 140ms ease, transform 140ms ease;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .aBtnPrimary:hover {
+      filter: brightness(0.9);
+      transform: translateY(-1px);
+    }
+
+    .aBtnPrimary:active { transform: translateY(0); }
+
+    .aBtnSecondary {
+      height: 40px;
+      padding: 0 18px;
+      background: none;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 140ms ease;
+      font-family: inherit;
+    }
+
+    .aBtnSecondary:hover { background: var(--blue-light); }
+
+    .aBtnDanger {
+      height: 36px;
+      padding: 0 14px;
+      background: none;
+      color: var(--red);
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 140ms ease;
+      font-family: inherit;
+    }
+
+    .aBtnDanger:hover { background: var(--red-light); }
+
+    /* ================================
+       STATS ROW
+    ================================ */
+    .aStatsGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .aStatCard {
+      padding: 24px 26px 26px;
+    }
+
+    .aStatCard__label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .aStatCard__num {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .aStatCard__num--blue { color: var(--blue); }
+    .aStatCard__num--green { color: var(--green); }
+    .aStatCard__num--orange { color: var(--orange); }
+
+    .aStatCard__sub {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ================================
+       SECTION PANEL
+    ================================ */
+    .aSection {
+      margin-bottom: 36px;
+    }
+
+    .aSectionHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .aSectionTitle {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* ================================
+       FILTER BAR
+    ================================ */
+    .aFilterBar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .aSearchWrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 380px;
+    }
+
+    .aSearchWrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .aSearch {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 42px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(17,17,17,0.12);
+      background: var(--card);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .aSearch:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(29,59,230,0.08);
+    }
+
+    .aSelect {
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(17,17,17,0.12);
+      background: var(--card);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 140ms ease;
+    }
+
+    .aSelect:focus { border-color: var(--blue); }
+
+    /* ================================
+       QUESTION TABLE
+    ================================ */
+    .aTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .aTable th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0 16px 14px;
+      border-bottom: 1px solid rgba(17,17,17,0.06);
+    }
+
+    .aTable td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(17,17,17,0.04);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    .aTable tr:last-child td { border-bottom: none; }
+
+    .aTable tr:hover td { background: rgba(29,59,230,0.02); }
+
+    .aTable__qtext {
+      font-weight: 600;
+      color: var(--text);
+      max-width: 380px;
+      line-height: 1.45;
+    }
+
+    .aTable__qtext span {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Tags */
+    .aTag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .aTag--math    { background: rgba(29,59,230,0.09);  color: var(--blue); }
+    .aTag--reading { background: rgba(168,85,247,0.09); color: #9333ea; }
+    .aTag--writing { background: rgba(249,115,22,0.09); color: var(--orange); }
+
+    .aDiffTag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .aDiffTag--easy   { background: var(--green-light);   color: var(--green); }
+    .aDiffTag--medium { background: var(--orange-light);  color: var(--orange); }
+    .aDiffTag--hard   { background: var(--red-light);     color: var(--red); }
+
+    .aActions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .aIconBtn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 140ms ease, color 140ms ease;
+      color: var(--muted);
+      font-family: inherit;
+    }
+
+    .aIconBtn:hover.edit   { background: var(--blue-light);  color: var(--blue); }
+    .aIconBtn:hover.delete { background: var(--red-light);   color: var(--red); }
+
+    .aEmptyRow td {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* ================================
+       MODAL
+    ================================ */
+    .aOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,17,17,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .aOverlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .aModal {
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(17,17,17,0.18);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 36px 36px 32px;
+      transform: translateY(12px);
+      transition: transform 200ms ease;
+    }
+
+    .aOverlay.is-open .aModal {
+      transform: translateY(0);
+    }
+
+    .aModal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .aModal__title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .aModal__close {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(17,17,17,0.06);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      transition: background 140ms ease;
+    }
+
+    .aModal__close:hover { background: rgba(17,17,17,0.10); }
+
+    /* Form fields */
+    .aField {
+      margin-bottom: 20px;
+    }
+
+    .aField__label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .aField__input,
+    .aField__textarea,
+    .aField__select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1.5px solid rgba(17,17,17,0.14);
+      background: #fafafa;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+
+    .aField__input,
+    .aField__select {
+      height: 48px;
+      padding: 0 16px;
+    }
+
+    .aField__textarea {
+      padding: 14px 16px;
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
+    }
+
+    .aField__input:focus,
+    .aField__textarea:focus,
+    .aField__select:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(29,59,230,0.08);
+    }
+
+    .aField__row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .aField__row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Options group */
+    .aOptionsGroup {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .aOptionRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .aOptionRow__letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .aOptionRow input[type="text"] {
+      flex: 1;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(17,17,17,0.14);
+      background: #fafafa;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .aOptionRow input[type="text"]:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(29,59,230,0.08);
+    }
+
+    .aOptionRow__correct {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--blue);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .aOptionRow__correctLabel {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .aModal__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(17,17,17,0.06);
+    }
+
+    /* ================================
+       TOAST
+    ================================ */
+    .aToast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--text);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 14px 22px;
+      border-radius: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 200ms ease, transform 200ms ease;
+      pointer-events: none;
+    }
+
+    .aToast.is-shown {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .aToast--green { background: var(--green); }
+    .aToast--red   { background: var(--red); }
+
+    /* ================================
+       CONFIRM DIALOG
+    ================================ */
+    .aConfirm {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,17,17,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease;
+    }
+
+    .aConfirm.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .aConfirm__box {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(17,17,17,0.18);
+      padding: 30px 32px 28px;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .aConfirm__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .aConfirm__sub {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .aConfirm__btns {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .aBtnCancel {
+      height: 40px;
+      padding: 0 18px;
+      background: rgba(17,17,17,0.06);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 140ms ease;
+    }
+
+    .aBtnCancel:hover { background: rgba(17,17,17,0.10); }
+
+    .aBtnDeleteConfirm {
+      height: 40px;
+      padding: 0 18px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: filter 140ms ease;
+    }
+
+    .aBtnDeleteConfirm:hover { filter: brightness(0.9); }
+
+    /* ================================
+       RESPONSIVE
+    ================================ */
+    @media (max-width: 1100px) {
+      .aStatsGrid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 820px) {
+      :root { --sidebar: 0px; }
+      .aSidebar { display: none; }
+      .aMain { margin-left: 0; padding: 28px 20px 80px; }
+      .aField__row, .aField__row3 { grid-template-columns: 1fr; }
+      .aStatsGrid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================
+     SIDEBAR
+================================ -->
+<div class="aSidebar">
+  <div class="aSidebar__logo">
+    <img src="assets/satify-footer-logo.png" alt="Satify" style="height: 32px; width: auto; object-fit: contain;">
+    <span class="aSidebar__logoLabel" style="margin-left: 8px;">ADMIN</span>
+  </div>
+
+  <nav class="aSidebar__nav">
+    <button class="aSidebar__item is-active" onclick="showView('questions')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      Сұрақтар
+    </button>
+
+    <button class="aSidebar__item" onclick="showView('stats')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Статистика
+    </button>
+
+    <button class="aSidebar__item" onclick="window.location.href='index.html'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Сайтқа оралу
+    </button>
+  </nav>
+
+  <div class="aSidebar__bottom">
+    <div class="aSidebar__adminTag">
+      <div class="aSidebar__adminAvatar">A</div>
+      <div class="aSidebar__adminInfo">
+        <div class="aSidebar__adminName">Admin</div>
+        <div class="aSidebar__adminRole">Әкімші</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================
+     MAIN
+================================ -->
+<div class="aMain">
+
+  <!-- ===========  QUESTIONS VIEW  =========== -->
+  <div id="view-questions">
+    <div class="aPageHeader">
+      <div>
+        <div class="aPageTitle">Сұрақтар</div>
+        <div class="aPageSub">SAT сұрақтарын басқару — қосу, өңдеу, жою</div>
+      </div>
+      <button class="aBtnPrimary" onclick="openAddModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Сұрақ қосу
+      </button>
+    </div>
+
+    <!-- Stats mini row -->
+    <div class="aStatsGrid" id="miniStats"></div>
+
+    <!-- Filter bar -->
+    <div class="aSection">
+      <div class="aFilterBar">
+        <div class="aSearchWrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input class="aSearch" type="text" id="searchInput" placeholder="Сұрақ бойынша іздеу..." oninput="renderTable()"/>
+        </div>
+        <select class="aSelect" id="filterSubject" onchange="renderTable()">
+          <option value="">Барлық бөлімдер</option>
+          <option value="Math">Math</option>
+          <option value="Reading">Reading</option>
+          <option value="Writing">Writing</option>
+        </select>
+        <select class="aSelect" id="filterDiff" onchange="renderTable()">
+          <option value="">Барлық деңгейлер</option>
+          <option value="Оңай">Оңай</option>
+          <option value="Орташа">Орташа</option>
+          <option value="Қиын">Қиын</option>
+        </select>
+        <select class="aSelect" id="filterType" onchange="renderTable()">
+          <option value="">Барлық түрлер</option>
+          <option value="Algebra">Algebra</option>
+          <option value="Geometry">Geometry</option>
+          <option value="Data Analysis">Data Analysis</option>
+          <option value="Inference">Inference</option>
+          <option value="Grammar">Grammar</option>
+          <option value="Vocabulary">Vocabulary</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="aCard" style="padding: 0 0 8px;">
+        <table class="aTable">
+          <thead>
+            <tr>
+              <th style="width:44px">#</th>
+              <th>Сұрақ мәтіні</th>
+              <th>Бөлім</th>
+              <th>Деңгей</th>
+              <th>Тип</th>
+              <th style="width:90px"></th>
+            </tr>
+          </thead>
+          <tbody id="qTableBody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px; font-size:13px; font-weight:500; color:var(--muted);" id="tableCount"></div>
+    </div>
+  </div>
+
+  <!-- ===========  STATS VIEW  =========== -->
+  <div id="view-stats" style="display:none;">
+    <div class="aPageHeader">
+      <div>
+        <div class="aPageTitle">Статистика</div>
+        <div class="aPageSub">Сұрақтар базасының шолуы</div>
+      </div>
+    </div>
+
+    <div class="aStatsGrid" id="fullStats"></div>
+
+    <!-- Breakdown by subject -->
+    <div class="aSection" style="margin-top:12px;">
+      <div class="aSectionHeader">
+        <div class="aSectionTitle">Бөлімдер бойынша бөліну</div>
+      </div>
+      <div class="aCard" style="padding: 28px 32px;" id="subjectBreakdown"></div>
+    </div>
+
+    <div class="aSection">
+      <div class="aSectionHeader">
+        <div class="aSectionTitle">Қиындық деңгейі</div>
+      </div>
+      <div class="aCard" style="padding: 28px 32px;" id="diffBreakdown"></div>
+    </div>
+  </div>
+
+</div><!-- /aMain -->
+
+<!-- ================================
+     ADD / EDIT MODAL
+================================ -->
+<div class="aOverlay" id="qOverlay" onclick="overlayClick(event)">
+  <div class="aModal">
+    <div class="aModal__header">
+      <div class="aModal__title" id="modalTitle">Сұрақ қосу</div>
+      <button class="aModal__close" onclick="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="qForm" onsubmit="submitForm(event)">
+      <input type="hidden" id="editId"/>
+
+      <!-- Subject / Difficulty / Type -->
+      <div class="aField__row3">
+        <div class="aField">
+          <label class="aField__label">Бөлім</label>
+          <select class="aField__select" id="fSubject" required>
+            <option value="">Таңдаңыз</option>
+            <option value="Math">Math</option>
+            <option value="Reading">Reading</option>
+            <option value="Writing">Writing</option>
+          </select>
+        </div>
+        <div class="aField">
+          <label class="aField__label">Деңгей</label>
+          <select class="aField__select" id="fDiff" required>
+            <option value="">Таңдаңыз</option>
+            <option value="Оңай">Оңай</option>
+            <option value="Орташа">Орташа</option>
+            <option value="Қиын">Қиын</option>
+          </select>
+        </div>
+        <div class="aField">
+          <label class="aField__label">Тип</label>
+          <select class="aField__select" id="fType" required>
+            <option value="">Таңдаңыз</option>
+            <option value="Algebra">Algebra</option>
+            <option value="Geometry">Geometry</option>
+            <option value="Data Analysis">Data Analysis</option>
+            <option value="Inference">Inference</option>
+            <option value="Grammar">Grammar</option>
+            <option value="Vocabulary">Vocabulary</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Question text -->
+      <div class="aField">
+        <label class="aField__label">Сұрақ мәтіні</label>
+        <textarea class="aField__textarea" id="fText" placeholder="Сұрақты енгізіңіз..." required></textarea>
+      </div>
+
+      <!-- Answer options -->
+      <div class="aField">
+        <label class="aField__label">Жауап нұсқалары <span style="font-weight:500;color:var(--muted)">(дұрыс жауапты белгілеңіз)</span></label>
+        <div class="aOptionsGroup">
+          <div class="aOptionRow">
+            <span class="aOptionRow__letter">A</span>
+            <input type="text" id="fOpt0" placeholder="А нұсқасы..." required/>
+            <input type="radio" name="correct" value="0" class="aOptionRow__correct" id="rOpt0"/>
+            <label for="rOpt0" class="aOptionRow__correctLabel">Дұрыс</label>
+          </div>
+          <div class="aOptionRow">
+            <span class="aOptionRow__letter">B</span>
+            <input type="text" id="fOpt1" placeholder="Б нұсқасы..." required/>
+            <input type="radio" name="correct" value="1" class="aOptionRow__correct" id="rOpt1"/>
+            <label for="rOpt1" class="aOptionRow__correctLabel">Дұрыс</label>
+          </div>
+          <div class="aOptionRow">
+            <span class="aOptionRow__letter">C</span>
+            <input type="text" id="fOpt2" placeholder="В нұсқасы..." required/>
+            <input type="radio" name="correct" value="2" class="aOptionRow__correct" id="rOpt2"/>
+            <label for="rOpt2" class="aOptionRow__correctLabel">Дұрыс</label>
+          </div>
+          <div class="aOptionRow">
+            <span class="aOptionRow__letter">D</span>
+            <input type="text" id="fOpt3" placeholder="Г нұсқасы..." required/>
+            <input type="radio" name="correct" value="3" class="aOptionRow__correct" id="rOpt3"/>
+            <label for="rOpt3" class="aOptionRow__correctLabel">Дұрыс</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="aModal__footer">
+        <button type="button" class="aBtnCancel" onclick="closeModal()">Бас тарту</button>
+        <button type="submit" class="aBtnPrimary" id="modalSubmitBtn">Сақтау</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================================
+     DELETE CONFIRM
+================================ -->
+<div class="aConfirm" id="confirmOverlay">
+  <div class="aConfirm__box">
+    <div class="aConfirm__title">Сұрақты жою</div>
+    <div class="aConfirm__sub">Бұл сұрақ біржола жойылады. Жалғастырасыз ба?</div>
+    <div class="aConfirm__btns">
+      <button class="aBtnCancel" onclick="closeConfirm()">Бас тарту</button>
+      <button class="aBtnDeleteConfirm" onclick="confirmDelete()">Жою</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================
+     TOAST
+================================ -->
+<div class="aToast" id="toast"></div>
+
+<script src="project/js/main.js"></script>
+<script>
+/* ================================================
+   DATA STORE
+   Questions saved to localStorage under 'adminQuestions'
+   Falls back to the original practice.html dataset
+================================================ */
+
+const DEFAULT_QUESTIONS = [
+  { id:1,  subject:'Math',    difficulty:'Орташа', type:'Algebra',       text:'Егер 3x + 5 = 20 болса, x мәнін табыңыз.',                                      options:['3','5','10','15'],           answer:1 },
+  { id:2,  subject:'Math',    difficulty:'Оңай',   type:'Algebra',       text:'Егер 2x − 4 = 10 болса, x мәнін табыңыз.',                                      options:['5','7','3','9'],             answer:1 },
+  { id:3,  subject:'Math',    difficulty:'Оңай',   type:'Algebra',       text:'Егер x + 12 = 20 болса, x мәнін табыңыз.',                                      options:['6','8','10','32'],           answer:1 },
+  { id:4,  subject:'Math',    difficulty:'Қиын',   type:'Algebra',       text:'x² − 5x + 6 = 0 теңдеуінің түбірлері қандай?',                                 options:['x=1, x=6','x=2, x=3','x=−2, x=−3','x=0, x=5'], answer:1 },
+  { id:5,  subject:'Math',    difficulty:'Орташа', type:'Geometry',      text:'Радиусы 7 см болатын шеңбердің ауданы қандай? (π ≈ 3.14)',                      options:['44 см²','153.86 см²','49 см²','21.98 см²'], answer:1 },
+  { id:6,  subject:'Math',    difficulty:'Оңай',   type:'Geometry',      text:'Тіктөртбұрыштың ұзындығы 8, ені 5. Периметрі қанша?',                          options:['40','26','13','20'],         answer:1 },
+  { id:7,  subject:'Math',    difficulty:'Қиын',   type:'Geometry',      text:'Дұрыс үшбұрыштың қабырғасы 6 болса, ауданын табыңыз.',                         options:['9√3','18','12√3','36'],      answer:0 },
+  { id:8,  subject:'Math',    difficulty:'Орташа', type:'Data Analysis', text:'5, 8, 12, 7, 3 сандарының орташа мәнін табыңыз.',                               options:['6','7','8','9'],             answer:1 },
+  { id:9,  subject:'Math',    difficulty:'Оңай',   type:'Data Analysis', text:'4, 4, 6, 8, 10 сандарының медианасы қандай?',                                   options:['4','5','6','8'],             answer:2 },
+  { id:10, subject:'Reading', difficulty:'Оңай',   type:'Inference',     text:'Мәтінде негізгі идея деп нені атаймыз?',                                        options:['Кіріспені','Авторлық ойды','Тұжырымды','Мысалды'], answer:1 },
+  { id:11, subject:'Reading', difficulty:'Орташа', type:'Inference',     text:'"Контекст" дегеніміз не?',                                                      options:['Оқиға','Мәтін мазмұны','Жалғас сөздер','Автор'], answer:1 },
+  { id:12, subject:'Writing', difficulty:'Оңай',   type:'Grammar',       text:'Жазба жұмысында "тезис" дегеніміз не?',                                        options:['Мысал','Басты пікір','Кіріспе сөйлем','Қорытынды'], answer:1 },
+];
+
+function loadQuestions() {
+  const stored = localStorage.getItem('adminQuestions');
+  return stored ? JSON.parse(stored) : [...DEFAULT_QUESTIONS];
+}
+
+function saveQuestions(qs) {
+  localStorage.setItem('adminQuestions', JSON.stringify(qs));
+}
+
+let questions = loadQuestions();
+let nextId = questions.length ? Math.max(...questions.map(q => q.id)) + 1 : 1;
+let pendingDeleteId = null;
+
+/* ================================================
+   VIEWS
+================================================ */
+function showView(name) {
+  document.querySelectorAll('.aSidebar__item').forEach(b => b.classList.remove('is-active'));
+  event.currentTarget.classList.add('is-active');
+
+  document.getElementById('view-questions').style.display = name === 'questions' ? '' : 'none';
+  document.getElementById('view-stats').style.display     = name === 'stats'     ? '' : 'none';
+
+  if (name === 'stats') renderStats();
+}
+
+/* ================================================
+   STATS
+================================================ */
+function buildMiniStats() {
+  const total = questions.length;
+  const math  = questions.filter(q => q.subject === 'Math').length;
+  const read  = questions.filter(q => q.subject === 'Reading').length;
+  const write = questions.filter(q => q.subject === 'Writing').length;
+
+  return [
+    { label: 'Барлық сұрақтар', num: total,  cls: 'aStatCard__num--blue',   sub: 'базада бар' },
+    { label: 'Math',             num: math,   cls: 'aStatCard__num',         sub: 'сұрақ' },
+    { label: 'Reading',          num: read,   cls: 'aStatCard__num',         sub: 'сұрақ' },
+    { label: 'Writing',          num: write,  cls: 'aStatCard__num',         sub: 'сұрақ' },
+  ];
+}
+
+function renderMiniStats() {
+  const el = document.getElementById('miniStats');
+  if (!el) return;
+  el.innerHTML = buildMiniStats().map(s => `
+    <div class="aCard aStatCard">
+      <div class="aStatCard__label">${s.label}</div>
+      <div class="aStatCard__num ${s.cls}">${s.num}</div>
+      <div class="aStatCard__sub">${s.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderStats() {
+  const el = document.getElementById('fullStats');
+  if (el) {
+    el.innerHTML = buildMiniStats().map(s => `
+      <div class="aCard aStatCard">
+        <div class="aStatCard__label">${s.label}</div>
+        <div class="aStatCard__num ${s.cls}">${s.num}</div>
+        <div class="aStatCard__sub">${s.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  // Subject breakdown bars
+  const subjects = ['Math','Reading','Writing'];
+  const colors   = ['var(--blue)','#9333ea','var(--orange)'];
+  const total    = questions.length || 1;
+  const sbEl     = document.getElementById('subjectBreakdown');
+  if (sbEl) {
+    sbEl.innerHTML = subjects.map((s, i) => {
+      const cnt = questions.filter(q => q.subject === s).length;
+      const pct = Math.round((cnt / total) * 100);
+      return `
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:15px;font-weight:700;color:var(--text)">${s}</span>
+            <span style="font-size:15px;font-weight:600;color:var(--muted)">${cnt} сұрақ — ${pct}%</span>
+          </div>
+          <div style="width:100%;height:12px;border-radius:999px;background:rgba(17,17,17,0.07);overflow:hidden;">
+            <div style="height:100%;border-radius:999px;background:${colors[i]};width:${pct}%;transition:width 0.9s cubic-bezier(0.22,1,0.36,1);"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    // Animate bars
+    setTimeout(() => {
+      sbEl.querySelectorAll('[style*="width:"]').forEach(b => {
+        const w = b.style.width; b.style.width = '0'; setTimeout(() => b.style.width = w, 50);
+      });
+    }, 50);
+  }
+
+  // Difficulty bars
+  const diffs  = ['Оңай','Орташа','Қиын'];
+  const dclrs  = ['var(--green)','var(--orange)','var(--red)'];
+  const dbEl   = document.getElementById('diffBreakdown');
+  if (dbEl) {
+    dbEl.innerHTML = diffs.map((d, i) => {
+      const cnt = questions.filter(q => q.difficulty === d).length;
+      const pct = Math.round((cnt / total) * 100);
+      return `
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:15px;font-weight:700;color:var(--text)">${d}</span>
+            <span style="font-size:15px;font-weight:600;color:var(--muted)">${cnt} сұрақ — ${pct}%</span>
+          </div>
+          <div style="width:100%;height:12px;border-radius:999px;background:rgba(17,17,17,0.07);overflow:hidden;">
+            <div style="height:100%;border-radius:999px;background:${dclrs[i]};width:${pct}%;transition:width 0.9s cubic-bezier(0.22,1,0.36,1);"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+/* ================================================
+   TABLE RENDER
+================================================ */
+function subjectTag(s) {
+  const map = { Math:'aTag--math', Reading:'aTag--reading', Writing:'aTag--writing' };
+  return `<span class="aTag ${map[s] || ''}">${s}</span>`;
+}
+
+function diffTag(d) {
+  const map = { 'Оңай':'aDiffTag--easy','Орташа':'aDiffTag--medium','Қиын':'aDiffTag--hard' };
+  return `<span class="aDiffTag ${map[d] || ''}">${d}</span>`;
+}
+
+function renderTable() {
+  questions = loadQuestions();
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const subj   = document.getElementById('filterSubject')?.value || '';
+  const diff   = document.getElementById('filterDiff')?.value || '';
+  const type   = document.getElementById('filterType')?.value || '';
+
+  let filtered = questions.filter(q => {
+    if (subj && q.subject !== subj) return false;
+    if (diff && q.difficulty !== diff) return false;
+    if (type && q.type !== type) return false;
+    if (search && !q.text.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('qTableBody');
+  const countEl = document.getElementById('tableCount');
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr class="aEmptyRow"><td colspan="6">Сұрақтар табылмады</td></tr>`;
+    countEl.textContent = '0 сұрақ';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((q, idx) => `
+    <tr>
+      <td style="color:var(--muted);font-weight:600;font-size:13px">${idx + 1}</td>
+      <td class="aTable__qtext">
+        ${q.text}
+        <span>Дұрыс жауап: ${q.options[q.answer]}</span>
+      </td>
+      <td>${subjectTag(q.subject)}</td>
+      <td>${diffTag(q.difficulty)}</td>
+      <td style="font-size:13px;font-weight:600;color:var(--muted)">${q.type}</td>
+      <td>
+        <div class="aActions">
+          <button class="aIconBtn edit" onclick="openEditModal(${q.id})" title="Өңдеу">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="aIconBtn delete" onclick="askDelete(${q.id})" title="Жою">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  countEl.textContent = `${filtered.length} / ${questions.length} сұрақ көрсетілуде`;
+  renderMiniStats();
+}
+
+/* ================================================
+   MODAL — ADD
+================================================ */
+function openAddModal() {
+  document.getElementById('editId').value = '';
+  document.getElementById('modalTitle').textContent = 'Сұрақ қосу';
+  document.getElementById('modalSubmitBtn').textContent = 'Қосу';
+  document.getElementById('qForm').reset();
+  document.getElementById('qOverlay').classList.add('is-open');
+}
+
+/* ================================================
+   MODAL — EDIT
+================================================ */
+function openEditModal(id) {
+  questions = loadQuestions();
+  const q = questions.find(x => x.id === id);
+  if (!q) return;
+
+  document.getElementById('editId').value      = id;
+  document.getElementById('modalTitle').textContent = 'Сұрақты өңдеу';
+  document.getElementById('modalSubmitBtn').textContent = 'Сақтау';
+
+  document.getElementById('fSubject').value = q.subject;
+  document.getElementById('fDiff').value    = q.difficulty;
+  document.getElementById('fType').value    = q.type;
+  document.getElementById('fText').value    = q.text;
+
+  q.options.forEach((opt, i) => {
+    const el = document.getElementById(`fOpt${i}`);
+    if (el) el.value = opt;
+  });
+
+  const radio = document.getElementById(`rOpt${q.answer}`);
+  if (radio) radio.checked = true;
+
+  document.getElementById('qOverlay').classList.add('is-open');
+}
+
+function closeModal() {
+  document.getElementById('qOverlay').classList.remove('is-open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('qOverlay')) closeModal();
+}
+
+/* ================================================
+   FORM SUBMIT
+================================================ */
+function submitForm(e) {
+  e.preventDefault();
+
+  const correctRadio = document.querySelector('input[name="correct"]:checked');
+  if (!correctRadio) { showToast('Дұрыс жауапты белгілеңіз', 'red'); return; }
+
+  const editId   = document.getElementById('editId').value;
+  const subject  = document.getElementById('fSubject').value;
+  const diff     = document.getElementById('fDiff').value;
+  const type     = document.getElementById('fType').value;
+  const text     = document.getElementById('fText').value.trim();
+  const options  = [0,1,2,3].map(i => document.getElementById(`fOpt${i}`).value.trim());
+  const answer   = parseInt(correctRadio.value);
+
+  questions = loadQuestions();
+
+  if (editId) {
+    // Edit existing
+    const idx = questions.findIndex(q => q.id === parseInt(editId));
+    if (idx !== -1) {
+      questions[idx] = { id: parseInt(editId), subject, difficulty: diff, type, text, options, answer };
+    }
+    showToast('Сұрақ жаңартылды', 'green');
+  } else {
+    // Add new
+    questions.push({ id: nextId++, subject, difficulty: diff, type, text, options, answer });
+    showToast('Жаңа сұрақ қосылды', 'green');
+  }
+
+  saveQuestions(questions);
+  closeModal();
+  renderTable();
+}
+
+/* ================================================
+   DELETE
+================================================ */
+function askDelete(id) {
+  pendingDeleteId = id;
+  document.getElementById('confirmOverlay').classList.add('is-open');
+}
+
+function closeConfirm() {
+  pendingDeleteId = null;
+  document.getElementById('confirmOverlay').classList.remove('is-open');
+}
+
+function confirmDelete() {
+  if (!pendingDeleteId) return;
+  questions = loadQuestions().filter(q => q.id !== pendingDeleteId);
+  saveQuestions(questions);
+  closeConfirm();
+  renderTable();
+  showToast('Сұрақ жойылды', 'red');
+}
+
+/* ================================================
+   TOAST
+================================================ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'aToast' + (type ? ` aToast--${type}` : '');
+  t.classList.add('is-shown');
+  setTimeout(() => t.classList.remove('is-shown'), 2600);
+}
+
+/* ================================================
+   KEYBOARD
+================================================ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+});
+
+/* ================================================
+   INIT
+================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderTable();
+  renderMiniStats();
+});
+</script>
+</body>
+</html>

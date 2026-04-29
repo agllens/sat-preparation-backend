@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="kk">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAT Mock Test</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    :root {
+      --blue: #1d3be6;
+      --blue-light: rgba(29, 59, 230, 0.08);
+      --blue-hover: #1430d6;
+      --bg: #f4f5f8;
+      --card: #ffffff;
+      --text: #111318;
+      --muted: #6b7280;
+      --radius: 20px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ================================
+       TEST TOP BAR  (below site header)
+    ================================ */
+    .tBar {
+      background: #fff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      /* not sticky — sits between header and content */
+    }
+
+    .tBar__title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
+
+    .tBar__progress {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .tBar__progress b {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .tBar__timer {
+      font-size: 17px;
+      font-weight: 700;
+      color: #d97706;
+      border: 2px solid #d97706;
+      border-radius: var(--radius-sm);
+      padding: 6px 18px;
+      min-width: 108px;
+      text-align: center;
+      letter-spacing: 1.5px;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .tBar__timer.is-low {
+      color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    /* ================================
+       MAIN LAYOUT
+    ================================ */
+    .tWrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 32px 48px 80px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ================================
+       SURFACE
+    ================================ */
+    .tSurface {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(29, 59, 230, 0.06);
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 16px 40px rgba(17, 17, 17, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tSurface::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(700px 500px at 50% 30%,
+          rgba(29, 59, 230, 0.07) 0%,
+          rgba(29, 59, 230, 0.025) 50%,
+          transparent 75%);
+    }
+
+    .tSurface::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* ================================
+       SIDEBAR
+    ================================ */
+    .tSidebar {
+      padding: 28px 24px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .tSidebar__heading {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .tSections {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tSection {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: background 160ms ease, color 160ms ease;
+      font-family: inherit;
+    }
+
+    .tSection:hover {
+      background: var(--blue-light);
+      color: var(--text);
+    }
+
+    .tSection.is-active {
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .tEndBtn {
+      width: 100%;
+      height: 52px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--blue);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      position: relative;
+      z-index: 2;
+      transition: background 160ms ease, transform 120ms ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .tEndBtn:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+    }
+
+    .tEndBtn:active {
+      transform: translateY(0);
+    }
+
+    /* ================================
+       MAIN / QUESTION CARD
+    ================================ */
+    .tMain {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tCard {
+      padding: 32px 36px 28px;
+      animation: fadeUp 0.28s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .tCard__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tCard__titleRow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tCard__num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tCard__points {
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .tCard__tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .tTag {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(17, 17, 17, 0.12);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(17, 17, 17, 0.7);
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tCard__question {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* options */
+    .tOptions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tOption {
+      width: 100%;
+      min-height: 54px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(29, 59, 230, 0.08);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(17, 17, 17, 0.85);
+      transition: border-color 140ms ease, background 140ms ease, transform 120ms ease, box-shadow 140ms ease;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .tOption:hover {
+      border-color: rgba(29, 59, 230, 0.22);
+      background: rgba(29, 59, 230, 0.04);
+      transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 8px 20px rgba(29, 59, 230, 0.08);
+    }
+
+    .tOption:active {
+      transform: translateY(0);
+    }
+
+    .tOption.is-selected {
+      border-color: rgba(29, 59, 230, 0.40);
+      background: rgba(29, 59, 230, 0.07);
+      font-weight: 600;
+    }
+
+    .tOpt__label {
+      min-width: 28px;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(17, 17, 17, 0.45);
+      flex-shrink: 0;
+    }
+
+    .tOption.is-selected .tOpt__label {
+      color: var(--blue);
+    }
+
+    /* ================================
+       BOTTOM NAV
+    ================================ */
+    .tBottomNav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 4px;
+    }
+
+    .tNavBtn {
+      height: 52px;
+      padding: 0 28px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(17, 17, 17, 0.14);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(17, 17, 17, 0.55);
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 140ms ease, color 140ms ease, background 140ms ease, transform 120ms ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .tNavBtn:hover:not(:disabled) {
+      border-color: rgba(29, 59, 230, 0.25);
+      color: var(--blue);
+      background: rgba(29, 59, 230, 0.03);
+      transform: translateY(-1px);
+    }
+
+    .tNavBtn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    .tBookmarkBtn {
+      height: 52px;
+      padding: 0 28px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--blue);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--blue);
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 140ms ease, color 140ms ease, transform 120ms ease;
+    }
+
+    .tBookmarkBtn:hover {
+      background: var(--blue-light);
+      transform: translateY(-1px);
+    }
+
+    .tBookmarkBtn.is-marked {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* ================================
+       QUESTION MAP
+    ================================ */
+    .tMap {
+      padding: 20px 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tMap__label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .tMap__dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tDot {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(17, 17, 17, 0.12);
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(17, 17, 17, 0.5);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 140ms ease;
+    }
+
+    .tDot:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .tDot.is-answered {
+      background: rgba(29, 59, 230, 0.10);
+      border-color: rgba(29, 59, 230, 0.30);
+      color: var(--blue);
+    }
+
+    .tDot.is-current {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .tDot.is-bookmarked {
+      background: #fef3c7;
+      border-color: #d97706;
+      color: #92400e;
+    }
+
+    /* ================================
+       RESPONSIVE
+    ================================ */
+    @media (max-width: 1100px) {
+      .tWrap {
+        grid-template-columns: 1fr;
+        padding: 24px 24px 60px;
+      }
+
+      .tSidebar {
+        position: relative;
+        top: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tBar {
+        padding: 0 20px;
+      }
+
+      .tBar__title {
+        font-size: 15px;
+      }
+
+      .tWrap {
+        padding: 16px 16px 50px;
+      }
+
+      .tCard {
+        padding: 22px 20px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Site header injected here -->
+  <div id="header-mount"></div>
+
+  <!-- TEST BAR — separate from site header -->
+  <div class="tBar">
+    <div class="tBar__title" id="testTitle">SAT Mock Test #1</div>
+    <div class="tBar__progress">
+      <b id="qGlobalCurrent">1</b> сұрақ <span id="qGlobalTotal">44</span> сұрақтан
+    </div>
+    <div class="tBar__timer" id="timer">02:14:00</div>
+  </div>
+
+  <div class="tWrap">
+
+    <!-- SIDEBAR -->
+    <aside class="tSidebar tSurface">
+      <div class="tSidebar__heading">Бөлімдер</div>
+      <div class="tSections" id="sectionBtns">
+        <button class="tSection is-active" data-section="Math">Math</button>
+        <button class="tSection" data-section="Reading">Reading</button>
+        <button class="tSection" data-section="Writing">Writing</button>
+      </div>
+      <button class="tEndBtn" id="endBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9" stroke="#fff" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Тестті аяқтау
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="tMain">
+
+      <!-- QUESTION CARD -->
+      <div class="tCard tSurface" id="qCard">
+        <div class="tCard__header">
+          <div class="tCard__titleRow">
+            <span class="tCard__num" id="qNum">Сұрақ 1</span>
+            <span class="tCard__points" id="qPoints">20 балл</span>
+          </div>
+          <div class="tCard__tags" id="qTags"></div>
+        </div>
+        <div class="tCard__question" id="qText"></div>
+        <div class="tOptions" id="qOptions"></div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="tBottomNav">
+        <button class="tNavBtn" id="prevBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Алдыңғы
+        </button>
+
+        <button class="tBookmarkBtn" id="bookmarkBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Белгілеу
+        </button>
+
+        <button class="tNavBtn" id="nextBtn">
+          Келесі
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- QUESTION MAP -->
+      <div class="tSurface tMap">
+        <div class="tMap__label">Сұрақтар картасы</div>
+        <div class="tMap__dots" id="qMap"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer injected here -->
+  <div id="footer-mount"></div>
+
+
+  <!-- Confirm modal -->
+  <div id="confirmOverlay"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9999;align-items:center;justify-content:center;">
+    <div
+      style="background:#fff;border-radius:20px;padding:36px 40px;max-width:420px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.18);text-align:center;">
+      <div style="font-size:20px;font-weight:800;color:#111318;margin-bottom:10px;">Тестті аяқтау?</div>
+      <div style="font-size:15px;color:#6b7280;margin-bottom:28px;line-height:1.5;" id="confirmMsg">Кейбір сұрақтарға
+        жауап берілмеген. Сіз шынымен тестті аяқтағыңыз келе ме?</div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button id="confirmCancel" type="button"
+          style="height:48px;padding:0 28px;border-radius:12px;border:1.5px solid rgba(0,0,0,0.14);background:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;color:#111;">Жоқ,
+          қалу</button>
+        <button id="confirmOk" type="button"
+          style="height:48px;padding:0 28px;border-radius:12px;border:none;background:#1d3be6;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">Иә,
+          аяқтау</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="project/js/main.js"></script>
+
+  <script>
+    /* ================================================
+       QUESTIONS DATA
+    ================================================ */
+    const QUESTIONS = {
+      Math: [
+        { text: 'Егер 3x + 5 = 20 болса, x мәнін табыңыз.', options: ['3', '5', '10', '15'], answer: 1, difficulty: 'Орташа', type: 'Algebra', points: 20 },
+        { text: 'Егер 2x − 4 = 10 болса, x мәнін табыңыз.', options: ['5', '7', '3', '9'], answer: 1, difficulty: 'Оңай', type: 'Algebra', points: 10 },
+        { text: 'x² − 5x + 6 = 0 теңдеуінің түбірлері қандай?', options: ['x=1, x=6', 'x=2, x=3', 'x=−2, x=−3', 'x=0, x=5'], answer: 1, difficulty: 'Қиын', type: 'Algebra', points: 30 },
+        { text: 'Радиусы 7 см болатын шеңбердің ауданы қандай? (π ≈ 3.14)', options: ['44 см²', '153.86 см²', '49 см²', '21.98 см²'], answer: 1, difficulty: 'Орташа', type: 'Geometry', points: 20 },
+        { text: 'Тіктөртбұрыштың ұзындығы 8, ені 5. Периметрі қанша?', options: ['40', '26', '13', '20'], answer: 1, difficulty: 'Оңай', type: 'Geometry', points: 10 },
+        { text: '5, 8, 12, 7, 3 сандарының орташа мәнін табыңыз.', options: ['6', '7', '8', '9'], answer: 2, difficulty: 'Орташа', type: 'Data Analysis', points: 20 },
+        { text: '4, 4, 6, 8, 10 сандарының медианасы қандай?', options: ['4', '5', '6', '8'], answer: 2, difficulty: 'Оңай', type: 'Data Analysis', points: 10 },
+        { text: 'Дұрыс үшбұрыштың қабырғасы 6 болса, ауданын табыңыз.', options: ['9√3', '18', '12√3', '36'], answer: 0, difficulty: 'Қиын', type: 'Geometry', points: 30 },
+        { text: 'Егер f(x) = 2x² − 3x + 1 болса, f(2) мәнін табыңыз.', options: ['1', '3', '5', '7'], answer: 1, difficulty: 'Орташа', type: 'Algebra', points: 20 },
+        { text: 'Прогрессияның алғашқы мүшесі 3, айырмасы 4. 10-шы мүшесі қандай?', options: ['35', '39', '43', '47'], answer: 1, difficulty: 'Орташа', type: 'Algebra', points: 20 },
+        { text: '√144 + √25 мәні қандай?', options: ['13', '17', '19', '21'], answer: 1, difficulty: 'Оңай', type: 'Algebra', points: 10 },
+        { text: 'Егер xy = 12 және x + y = 7 болса, x² + y² мәнін табыңыз.', options: ['1', '25', '49', '73'], answer: 1, difficulty: 'Қиын', type: 'Algebra', points: 30 },
+        { text: '3⁴ × 3² = ?', options: ['81', '243', '729', '2187'], answer: 2, difficulty: 'Оңай', type: 'Algebra', points: 10 },
+        { text: 'Жылдамдығы 60 км/сағ болатын пойыз 3 сағатта қанша жол жүреді?', options: ['120 км', '150 км', '180 км', '200 км'], answer: 2, difficulty: 'Оңай', type: 'Data Analysis', points: 10 },
+        { text: 'log₂(64) мәнін табыңыз.', options: ['4', '5', '6', '8'], answer: 2, difficulty: 'Орташа', type: 'Algebra', points: 20 },
+        { text: 'Синустың мәні 0.5-ке тең болатын бұрыш? (0°–360°)', options: ['30° және 150°', '45° және 135°', '60° және 120°', '30° және 330°'], answer: 0, difficulty: 'Қиын', type: 'Geometry', points: 30 },
+        { text: 'Егер 5% пайызбен 10 000 теңге 2 жыл салынса, жай пайыздан қанша пайда?', options: ['500', '1000', '1500', '2000'], answer: 1, difficulty: 'Орташа', type: 'Data Analysis', points: 20 },
+        { text: '(x + 3)(x − 3) өрнегін жайыңыз.', options: ['x² + 9', 'x² − 9', 'x² + 6x − 9', 'x² − 6x + 9'], answer: 1, difficulty: 'Оңай', type: 'Algebra', points: 10 },
+      ],
+      Reading: [
+        { text: 'Мәтінде "негізгі идея" деп нені атаймыз?', options: ['Кіріспені', 'Авторлық ойды', 'Тұжырымды', 'Мысалды'], answer: 1, difficulty: 'Оңай', type: 'Comprehension', points: 10 },
+        { text: '"Контекст" дегеніміз не?', options: ['Оқиға желісі', 'Мәтіннің мазмұны мен ортасы', 'Жалғас сөздер', 'Автор туралы мәлімет'], answer: 1, difficulty: 'Орташа', type: 'Vocabulary', points: 20 },
+        { text: 'Авторлық позицияны анықтаудың ең дұрыс жолы қандай?', options: ['Тек алғашқы сөйлемді оқу', 'Тезис пен тұжырымды салыстыру', 'Тек соңғы абзацты оқу', 'Тақырыпты ғана қарау'], answer: 1, difficulty: 'Орташа', type: 'Analysis', points: 20 },
+        { text: '"Жанама мағына" (implicit meaning) дегеніміз не?', options: ['Тікелей айтылған мәлімет', 'Мәтінде тікелей берілмеген бірақ түсінілетін мағына', 'Сөздің сөздіктегі мағынасы', 'Автордың атауы'], answer: 1, difficulty: 'Қиын', type: 'Analysis', points: 30 },
+        { text: 'Риторикалық сұрақтың мақсаты не?', options: ['Жауап алу үшін', 'Оқырманды ойландыру үшін', 'Статистика келтіру үшін', 'Дәйексөз беру үшін'], answer: 1, difficulty: 'Орташа', type: 'Rhetoric', points: 20 },
+        { text: 'Мәтіннің құрылымы дегеніміз не?', options: ['Автордың аты', 'Мәтіннің ұйымдасу тәсілі мен бөліктері', 'Жазылған жыл', 'Тілдік ерекшеліктер'], answer: 1, difficulty: 'Оңай', type: 'Structure', points: 10 },
+        { text: '"Evidence-based" сұраққа жауап берген кезде не қарастыру керек?', options: ['Тек интуицияға сену', 'Мәтінден нақты дәлелдер табу', 'Сыртқы ақпарат пайдалану', 'Сұрақты аудару'], answer: 1, difficulty: 'Орташа', type: 'Analysis', points: 20 },
+        { text: 'Аналогия (analogy) дегеніміз не?', options: ['Қайшылық', 'Ұқсастық арқылы түсіндіру', 'Мысал келтіру', 'Анықтама беру'], answer: 1, difficulty: 'Орташа', type: 'Vocabulary', points: 20 },
+        { text: 'Авторлық "тон" (tone) қандай элементтерден анықталады?', options: ['Сөз таңдауынан үнінен мазмұнынан', 'Тек ұзындығынан', 'Тек пунктуациядан', 'Кіріспенің ғана бойынша'], answer: 0, difficulty: 'Қиын', type: 'Analysis', points: 30 },
+      ],
+      Writing: [
+        { text: 'Жазба жұмысында "тезис" дегеніміз не?', options: ['Мысал', 'Басты пікір', 'Кіріспе сөйлем', 'Қорытынды'], answer: 1, difficulty: 'Оңай', type: 'Grammar', points: 10 },
+        { text: 'Келесі сөйлемдердің қайсысы грамматикалық жағынан дұрыс?', options: ['Me and him went to school.', 'He and I went to school.', 'Him and me went to school.', 'I and him went to school.'], answer: 1, difficulty: 'Орташа', type: 'Grammar', points: 20 },
+        { text: 'Нүктелі үтір (;) қашан қолданылады?', options: ['Тізімдеме алдында', 'Тең дәрежелі дербес сөйлемдерді байланыстырғанда', 'Тырнақша алдында', 'Бағыныңқы сөйлем алдында'], answer: 1, difficulty: 'Орташа', type: 'Punctuation', points: 20 },
+        { text: '"Effect" және "affect" айырмашылығы қандай?', options: ['"Effect" — етістік "affect" — зат есім', '"Effect" — зат есім (нәтиже) "affect" — етістік (әсер ету)', 'Мағынасы бірдей', 'Тек жазылуы ғана ерекшеленеді'], answer: 1, difficulty: 'Орташа', type: 'Vocabulary', points: 20 },
+        { text: 'Параллельді құрылым (parallel structure) дегеніміз не?', options: ['Сөйлемдерді бір-бірімен байланыстыру', 'Тізімдегі элементтердің бірдей грамматикалық формада болуы', 'Бір сөйлемде екі ой беру', 'Активті рай қолдану'], answer: 1, difficulty: 'Қиын', type: 'Sentence Structure', points: 30 },
+        { text: 'Қай сөйлем артық (redundant)?', options: ['The report is due tomorrow.', 'The final end result was positive.', 'She revised her essay carefully.', 'He submitted the project on time.'], answer: 1, difficulty: 'Орташа', type: 'Style', points: 20 },
+        { text: 'Белсенді және бейтарап рай (active vs passive voice) айырмашылығы?', options: ['Бейтарап рай — ауызекі сөйлеуде', 'Белсенді рай — іс-әрекет субъектіден шыққанда қолданылады', 'Мағынасы бірдей', 'Бейтарап рай жақсырақ'], answer: 1, difficulty: 'Орташа', type: 'Grammar', points: 20 },
+        { text: '"However" қолданылғанда пунктуациясы қалай болуы керек?', options: ['Үтірсіз', 'Нүктелі үтір немесе үтірмен екі жағынан', 'Тек соңына нүкте', 'Тек алдына үтір'], answer: 1, difficulty: 'Қиын', type: 'Punctuation', points: 30 },
+        { text: '"Its" және "it\'s" айырмашылығы қандай?', options: ['"Its" — it is қысқартылған түрі', '"It\'s" — it is қысқартылған түрі "its" — тәуелдік есімдік', 'Мағынасы бірдей', 'Тек американдық ағылшынша ерекшелік'], answer: 1, difficulty: 'Оңай', type: 'Grammar', points: 10 },
+      ]
+    };
+
+    /* ================================================
+       TOTAL COUNT across all sections
+    ================================================ */
+    const TOTAL_ALL = Object.values(QUESTIONS).reduce((s, arr) => s + arr.length, 0);
+
+    /* ================================================
+       READ TEST NUMBER FROM URL  (?test=2  →  "SAT Mock Test #2")
+    ================================================ */
+    const urlParams = new URLSearchParams(window.location.search);
+    const testNum = urlParams.get('test') || '1';
+    document.title = `SAT Mock Test #${testNum}`;
+    document.getElementById('testTitle').textContent = `SAT Mock Test #${testNum}`;
+
+    /* ================================================
+       STATE
+    ================================================ */
+    let currentSection = 'Math';
+    let currentIndex = 0;
+    const answers = { Math: {}, Reading: {}, Writing: {} };
+    const bookmarks = { Math: {}, Reading: {}, Writing: {} };
+
+    /* ================================================
+       GLOBAL QUESTION NUMBER (across all sections)
+    ================================================ */
+    const SECTION_ORDER = ['Math', 'Reading', 'Writing'];
+
+    function getGlobalIndex() {
+      let offset = 0;
+      for (const sec of SECTION_ORDER) {
+        if (sec === currentSection) return offset + currentIndex + 1;
+        offset += QUESTIONS[sec].length;
+      }
+      return 1;
+    }
+
+    /* ================================================
+       TIMER  (2h 14min)
+    ================================================ */
+    let totalSeconds = 2 * 3600 + 14 * 60;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function updateTimer() {
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      const el = document.getElementById('timer');
+      el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+      if (totalSeconds <= 300) el.classList.add('is-low');
+      if (totalSeconds > 0) totalSeconds--;
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    /* ================================================
+       RENDER
+    ================================================ */
+    function getQs() { return QUESTIONS[currentSection]; }
+
+    function renderQuestion() {
+      const qs = getQs();
+      const q = qs[currentIndex];
+
+      // global progress counter
+      document.getElementById('qGlobalCurrent').textContent = getGlobalIndex();
+      document.getElementById('qGlobalTotal').textContent = TOTAL_ALL;
+
+      // card content
+      document.getElementById('qNum').textContent = `Сұрақ ${currentIndex + 1}`;
+      document.getElementById('qPoints').textContent = `${q.points} балл`;
+
+      document.getElementById('qTags').innerHTML =
+        `<span class="tTag">${currentSection}</span>
+       <span class="tTag">${q.difficulty}</span>
+       <span class="tTag">${q.type}</span>`;
+
+      document.getElementById('qText').textContent = q.text;
+
+      const selected = answers[currentSection][currentIndex];
+      document.getElementById('qOptions').innerHTML = q.options.map((opt, i) => `
+      <button class="tOption${selected === i ? ' is-selected' : ''}" data-idx="${i}" type="button">
+        <span class="tOpt__label">${String.fromCharCode(65 + i)}.</span>
+        <span>${opt}</span>
+      </button>
+    `).join('');
+
+      document.querySelectorAll('.tOption').forEach(btn => {
+        btn.addEventListener('click', () => {
+          answers[currentSection][currentIndex] = Number(btn.dataset.idx);
+          renderQuestion();
+          renderMap();
+        });
+      });
+
+      // prev / next
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+      document.getElementById('nextBtn').disabled = currentIndex === qs.length - 1;
+
+      // bookmark
+      const bBtn = document.getElementById('bookmarkBtn');
+      if (bookmarks[currentSection][currentIndex]) {
+        bBtn.classList.add('is-marked');
+        bBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Белгіленді`;
+      } else {
+        bBtn.classList.remove('is-marked');
+        bBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Белгілеу`;
+      }
+
+      // no animation reset — prevents page jump on answer select
+    }
+
+    function renderMap() {
+      const qs = getQs();
+      document.getElementById('qMap').innerHTML = qs.map((_, i) => {
+        let cls = 'tDot';
+        if (i === currentIndex) cls += ' is-current';
+        else if (bookmarks[currentSection][i]) cls += ' is-bookmarked';
+        else if (answers[currentSection][i] !== undefined) cls += ' is-answered';
+        return `<button class="${cls}" data-i="${i}" type="button">${i + 1}</button>`;
+      }).join('');
+
+      document.querySelectorAll('.tDot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          currentIndex = Number(dot.dataset.i);
+          renderQuestion();
+          renderMap();
+        });
+      });
+    }
+
+    function renderSections() {
+      document.querySelectorAll('.tSection').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.section === currentSection);
+      });
+    }
+
+    /* ================================================
+       EVENTS
+    ================================================ */
+    document.querySelectorAll('.tSection').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentSection = btn.dataset.section;
+        currentIndex = 0;
+        renderSections();
+        renderQuestion();
+        renderMap();
+      });
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentIndex > 0) { currentIndex--; renderQuestion(); renderMap(); }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentIndex < getQs().length - 1) { currentIndex++; renderQuestion(); renderMap(); }
+    });
+
+    document.getElementById('bookmarkBtn').addEventListener('click', () => {
+      bookmarks[currentSection][currentIndex] = !bookmarks[currentSection][currentIndex];
+      renderQuestion();
+      renderMap();
+    });
+
+    // keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+      if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const opts = document.querySelectorAll('.tOption');
+        if (opts[Number(e.key) - 1]) opts[Number(e.key) - 1].click();
+      }
+    });
+
+    /* ================================================
+       SEND TO BACKEND
+    ================================================ */
+    async function sendResultToBackend(result) {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Вы не авторизованы");
+        window.location.href = "login.html";
+      }
+
+      const response = await fetch("http://localhost:8080/api/v1/attempts/save-result", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          testNum: result.testNum,
+          mode: "MOCK",
+
+          //BASIC 
+          satScore: result.satScore,
+          totalCorrect: result.totalCorrect,
+          totalAnswered: result.totalAnswered,
+          totalQuestions: result.totalQuestions,
+          accuracy: result.totalCorrect / result.totalQuestions,
+
+          //TIME
+          timeTaken: result.timeTaken,
+
+          //SECTION
+          sectionResults: result.breakdown
+        })
+      });
+
+      if (!response.ok) {
+        console.error("Ошибка сохранения результата");
+      } else {
+        console.log("Результат успешно сохранён");
+      }
+    }
+
+
+    /* ================================================
+       SCORING + END TEST
+    ================================================ */
+    function calcResults() {
+      let totalCorrect = 0;
+      let totalAnswered = 0;
+      const breakdown = {};
+
+      for (const sec of SECTION_ORDER) {
+        const qs = QUESTIONS[sec];
+        let secCorrect = 0;
+        let secAnswered = 0;
+
+        qs.forEach((q, i) => {
+          const chosen = answers[sec][i];
+          if (chosen !== undefined) {
+            totalAnswered++;
+            secAnswered++;
+            if (chosen === q.answer) {
+              totalCorrect++;
+              secCorrect++;
+            }
+          }
+        });
+
+        breakdown[sec] = {
+          correct: secCorrect,
+          total: qs.length,
+          answered: secAnswered
+        };
+      }
+
+      // SAT-style scaled score: 400–1600
+      // Each correct answer is worth roughly 1600/TOTAL_ALL points, min 400
+      const rawRatio = totalCorrect / TOTAL_ALL;
+      const satScore = Math.round(400 + rawRatio * 1200);
+
+      return {
+        satScore,
+        totalCorrect,
+        totalAnswered,
+        totalQuestions: TOTAL_ALL,
+        testNum,
+        breakdown,
+        timeTaken: 2 * 3600 + 14 * 60 - totalSeconds
+      };
+    }
+
+    function countUnanswered() {
+      let count = 0;
+      for (const sec of SECTION_ORDER) {
+        QUESTIONS[sec].forEach((_, i) => {
+          if (answers[sec][i] === undefined) count++;
+        });
+      }
+      return count;
+    }
+
+    async function finishTest() {
+      const results = calcResults();
+      await sendResultToBackend(results);
+      localStorage.setItem('satResults', JSON.stringify(results));
+      window.location.href = 'result.html';
+    }
+
+    // End button → show confirm modal
+    document.getElementById('endBtn').addEventListener('click', () => {
+      const unanswered = countUnanswered();
+      const overlay = document.getElementById('confirmOverlay');
+      const msg = document.getElementById('confirmMsg');
+
+      if (unanswered === 0) {
+        msg.textContent = 'Барлық ' + TOTAL_ALL + ' сұраққа жауап бердіңіз. Нәтижені көруге дайынсыз ба?';
+      } else {
+        msg.textContent = unanswered + ' сұраққа жауап берілмеді. Сіз шынымен тестті аяқтағыңыз келе ме?';
+      }
+
+      overlay.style.display = 'flex';
+    });
+
+    document.getElementById('confirmCancel').addEventListener('click', () => {
+      document.getElementById('confirmOverlay').style.display = 'none';
+    });
+
+    document.getElementById('confirmOk').addEventListener('click', () => {
+      finishTest();
+    });
+
+    // Close on backdrop click
+    document.getElementById('confirmOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('confirmOverlay')) {
+        document.getElementById('confirmOverlay').style.display = 'none';
+      }
+    });
+
+    /* ================================================
+       INIT
+    ================================================ */
+    renderQuestion();
+    renderMap();
+  </script>
+</body>
+
+</html>

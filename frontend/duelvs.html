@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Қарсылас табылды! — SATify</title>
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f4f5f8;color:#111318;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* PAGE CONTENT */
+    .dMain{flex:1;display:flex;flex-direction:column;align-items:center;padding:120px 24px 80px;text-align:center;}
+    .dMain__title{font-size:52px;font-weight:800;color:#1d3be6;letter-spacing:-1px;margin-bottom:14px;}
+    .dMain__countdown{font-size:20px;font-weight:700;color:#111318;margin-bottom:60px;}
+
+    /* VS arena */
+    .vsArena{position:relative;width:680px;max-width:100%;height:300px;display:flex;align-items:center;justify-content:center;}
+    .vsBlob{position:absolute;top:50%;width:280px;height:280px;border-radius:50%;transform:translateY(-50%);}
+    .vsBlob--left{left:0;background:radial-gradient(circle,rgba(29,59,230,0.14) 0%,transparent 70%);}
+    .vsBlob--right{right:0;background:radial-gradient(circle,rgba(29,59,230,0.10) 0%,transparent 70%);}
+    .vsRow{position:relative;z-index:2;display:flex;align-items:center;gap:40px;justify-content:center;width:100%;}
+    .vsPlayer{display:flex;flex-direction:column;align-items:center;gap:18px;}
+    .vsPlayer__name{font-size:18px;font-weight:700;color:#111318;}
+    .vsAvatar{width:90px;height:90px;border-radius:50%;background:#fff;box-shadow:0 4px 24px rgba(29,59,230,0.16);display:flex;align-items:center;justify-content:center;}
+    .vsLabel{font-size:36px;font-weight:900;color:#111318;letter-spacing:-1px;}
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<main class="dMain">
+  <h1 class="dMain__title">Қарсылас табылды!</h1>
+  <div class="dMain__countdown" id="cdText">Басталуы: 5...</div>
+
+  <div class="vsArena">
+    <div class="vsBlob vsBlob--left"></div>
+    <div class="vsBlob vsBlob--right"></div>
+    <div class="vsRow">
+      <div class="vsPlayer">
+        <div class="vsPlayer__name" id="p1name">Sultan Bazarbaiuly</div>
+        <div class="vsAvatar">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1d3be6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="vsLabel">VS</div>
+      <div class="vsPlayer">
+        <div class="vsAvatar">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1d3be6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="vsPlayer__name" id="p2name">Almaz Talgatuly</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="footer-mount"></div>
+
+<script src="project/js/main.js"></script>
+
+<script>
+  // Auth & Opponent Logic
+  document.addEventListener("DOMContentLoaded", () => {
+    const u = JSON.parse(localStorage.getItem('satifyUser') || 'null');
+    if (u && u.name) {
+      document.getElementById('p1name').textContent = u.name;
+    }
+
+    // Random opponent
+    const OPPS = ['Almaz Talgatuly','Aizat Bekova','Daniyar Seitkali','Kamila Yesova','Amir Nurgali'];
+    const opp = OPPS[Math.floor(Math.random() * OPPS.length)];
+    document.getElementById('p2name').textContent = opp;
+    localStorage.setItem('duelOpponent', opp);
+
+    // Countdown then navigate
+    let n = 5;
+    const el = document.getElementById('cdText');
+    const t = setInterval(() => {
+      n--;
+      if (n <= 0) { 
+        clearInterval(t); 
+        window.location.href = 'duelquestion.html'; 
+      }
+      else el.textContent = `Басталуы: ${n}...`;
+    }, 1000);
+  });
+</script>
+</body>
+</html>

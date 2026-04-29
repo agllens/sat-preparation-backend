@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="kk">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Профиль</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="mobile.css"/>
+  <style>
+    :root {
+      --blue: #1d3be6;
+      --blue-light: rgba(29, 59, 230, 0.08);
+      --bg: #f4f5f8;
+      --card: #ffffff;
+      --text: #111318;
+      --muted: #6b7280;
+      --green: #22c55e;
+      --green-light: rgba(34, 197, 94, 0.10);
+      --radius: 22px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .pWrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 48px 100px;
+    }
+
+    .pTitle {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+
+    .pCard {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.025),
+        0 14px 38px rgba(17, 17, 17, 0.055);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pCard::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* PROFILE CARD */
+    .profileCard {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      padding: 36px 44px;
+      margin-bottom: 52px;
+      width: fit-content;
+    }
+
+    .profileAvatar {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profileAvatar__initials {
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .avatarOverlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .profileAvatar:hover .avatarOverlay {
+      opacity: 1;
+    }
+
+    /* PROFILE META + EDIT BUTTON LAYOUT */
+    .profileRight {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .profileMeta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .profileMeta__item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .profileMeta__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .profileMeta__value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* EDIT BUTTON */
+    .editProfileBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 20px;
+      border-radius: 999px;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.18s ease;
+      width: fit-content;
+    }
+
+    .editProfileBtn:hover {
+      background: rgba(29, 59, 230, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .editProfileBtn:active {
+      transform: translateY(0);
+    }
+
+    /* LOGOUT BUTTON */
+    .logoutBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 20px;
+      border-radius: 999px;
+      background: rgba(220, 38, 38, 0.08);
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.18s ease;
+      width: fit-content;
+    }
+
+    .logoutBtn:hover {
+      background: rgba(220, 38, 38, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .logoutBtn:active {
+      transform: translateY(0);
+    }
+
+    .profileActions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* STATS ROW */
+    .statsRow {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 22px;
+      margin-bottom: 52px;
+    }
+
+    .scoreCard {
+      padding: 32px 36px 36px;
+    }
+
+    .scoreCard__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .scoreNums {
+      display: flex;
+      align-items: flex-end;
+      margin-bottom: 22px;
+    }
+
+    .scoreNum {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .scoreNum__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .scoreNum__val {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .scoreNum__val--blue {
+      color: var(--blue);
+    }
+
+    .scoreDivider {
+      align-self: flex-end;
+      padding: 0 18px 10px;
+      font-size: 40px;
+      font-weight: 300;
+      color: rgba(17, 17, 17, 0.18);
+    }
+
+    .scoreProgress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.07);
+      overflow: hidden;
+    }
+
+    .scoreProgress__fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--blue);
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .scoreProgress__labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .scoreProgress__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    /* STREAK CARD */
+    .streakCard {
+      padding: 32px 36px 36px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .streakCard__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .streakNum {
+      font-size: 96px;
+      font-weight: 800;
+      letter-spacing: -4px;
+      line-height: 1;
+      color: var(--blue);
+      margin: 24px 0 4px;
+    }
+
+    .streakSubLabel {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .streakDots {
+      display: flex;
+      gap: 8px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .streakDot {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(17, 17, 17, 0.07);
+      transition: background 0.35s ease;
+    }
+
+    .streakDot.is-done {
+      background: var(--blue);
+    }
+
+    /* WEEKLY PLAN */
+    .weekSection {
+      margin-bottom: 52px;
+    }
+
+    .weekGrid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 18px;
+    }
+
+    .dayCard {
+      padding: 20px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      min-height: 148px;
+      cursor: default;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .dayCard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(29, 59, 230, 0.09), 0 2px 6px rgba(0, 0, 0, 0.035);
+    }
+
+    .dayCard__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dayCard__day {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .dayCard__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(17, 17, 17, 0.12);
+      flex-shrink: 0;
+    }
+
+    .dayCard__dot.is-done {
+      background: var(--green);
+    }
+
+    .dayCard__dot.is-today {
+      background: var(--blue);
+    }
+
+    .dayCard__subject {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.2px;
+      margin-top: auto;
+      padding-top: 28px;
+    }
+
+    .dayCard.is-done .dayCard__subject {
+      color: rgba(17, 17, 17, 0.38);
+    }
+
+    /* ACHIEVEMENTS */
+    .achieveSection {
+      margin-bottom: 52px;
+    }
+
+    .achieveGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .achieveCard {
+      padding: 26px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      cursor: default;
+    }
+
+    .achieveCard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(29, 59, 230, 0.08), 0 2px 6px rgba(0, 0, 0, 0.035);
+    }
+
+    .achieveCard.is-locked {
+      opacity: 0.45;
+    }
+
+    .achieveIcon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-bottom: 4px;
+    }
+
+    .achieveIcon--green {
+      background: var(--green-light);
+    }
+
+    .achieveIcon--blue {
+      background: var(--blue-light);
+    }
+
+    .achieveIcon--gray {
+      background: rgba(17, 17, 17, 0.06);
+    }
+
+    .achieveIcon svg {
+      display: block;
+    }
+
+    .achieveBadge {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      width: fit-content;
+    }
+
+    .achieveBadge--green {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .achieveBadge--blue {
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .achieveBadge--gray {
+      background: rgba(17, 17, 17, 0.07);
+      color: var(--muted);
+    }
+
+    .achieveCard__name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+    }
+
+    .achieveCard__desc {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* HISTORY */
+    .historySection {
+      margin-bottom: 20px;
+    }
+
+    .historyGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
+
+    .historyCard {
+      padding: 24px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      cursor: default;
+    }
+
+    .historyCard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(29, 59, 230, 0.09), 0 2px 6px rgba(0, 0, 0, 0.035);
+    }
+
+    .historyCard__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .historyCard__date {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .historyCard__score {
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -2.5px;
+      line-height: 1;
+    }
+
+    .historyCard__label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .historyCard__delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .historyCard__delta--up {
+      background: rgba(34, 197, 94, 0.10);
+      color: #22c55e;
+    }
+
+    .historyCard__delta--down {
+      background: rgba(239, 68, 68, 0.10);
+      color: #ef4444;
+    }
+
+    .historyCard__delta--same {
+      background: rgba(17, 17, 17, 0.06);
+      color: #6b7280;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1100px) {
+      .weekGrid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .achieveGrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .historyGrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .statsRow {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .pWrap {
+        padding: 28px 20px 80px;
+      }
+
+      .pTitle {
+        font-size: 32px;
+      }
+
+      .weekGrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .achieveGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .historyGrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .profileCard {
+        padding: 24px 22px;
+        gap: 22px;
+        width: 100%;
+      }
+
+      .profileMeta {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .profileAvatar {
+        width: 80px;
+        height: 80px;
+      }
+
+      .profileAvatar__initials {
+        font-size: 28px;
+      }
+
+      .profileMeta__value {
+        font-size: 18px;
+      }
+
+      .scoreNum__val {
+        font-size: 56px;
+      }
+
+      .streakNum {
+        font-size: 72px;
+      }
+
+      .historyCard__score {
+        font-size: 48px;
+      }
+    }
+  </style>
+</head>
+
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22, 1, .36, 1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+
+    70% {
+      transform: scale(1.28);
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float {
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before {
+      animation: none;
+    }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <path d="M8 10h8M8 13.5h5" />
+    </svg>
+  </a>
+</div>
+
+<body>
+
+  <div id="header-mount"></div>
+
+  <div class="pWrap">
+
+    <!-- PROFILE CARD -->
+    <div class="pCard profileCard">
+      <div class="profileAvatar" id="avatarEl" onclick="document.getElementById('avatarInput').click()">
+        <span class="profileAvatar__initials" id="avatarInitials">BS</span>
+        <img id="avatarImg" src="" alt=""
+          style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+        <div class="avatarOverlay">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 14.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#fff" stroke-width="1.8" />
+            <path
+              d="M2 8.5A1.5 1.5 0 0 1 3.5 7H5l1.5-2h7L15 7h1.5A1.5 1.5 0 0 1 18 8.5v8A1.5 1.5 0 0 1 16.5 18h-11A1.5 1.5 0 0 1 4 16.5v-8Z"
+              stroke="#fff" stroke-width="1.8" />
+          </svg>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" />
+      </div>
+
+      <div class="profileRight">
+        <div class="profileMeta">
+          <div class="profileMeta__item">
+            <div class="profileMeta__label">Аты-жөніңіз:</div>
+            <!-- <div class="profileMeta__value">Tileubergen Karakat</div> -->
+            <div class="profileMeta__value" id="fullName">Loading...</div>
+          </div>
+          <div class="profileMeta__item">
+            <div class="profileMeta__label">Email:</div>
+            <!-- <div class="profileMeta__value">220103068@stu.sdu.edu.kz</div> -->
+            <div class="profileMeta__value" id="email">Loading...</div>
+          </div>
+        </div>
+
+        <!-- EDIT + LOGOUT BUTTONS -->
+        <div class="profileActions">
+          <a href="editprofile.html" class="editProfileBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Профильді өңдеу
+          </a>
+          <button class="logoutBtn" onclick="handleLogout()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 2H2.5A.5.5 0 0 0 2 2.5v9a.5.5 0 0 0 .5.5H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M9 4l3 3-3 3M12 7H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Шығу
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORE + STREAK -->
+    <div class="statsRow">
+
+      <div class="pCard scoreCard">
+        <div class="scoreCard__title">Жалпы нәтиже</div>
+        <div class="scoreNums">
+          <div class="scoreNum">
+            <span class="scoreNum__label">Ағымдағы балл</span>
+            <span class="scoreNum__val scoreNum__val--blue" id="latestScore">...</span>
+          </div>
+          <span class="scoreDivider">/</span>
+          <div class="scoreNum">
+            <span class="scoreNum__label">Мақсат балл</span>
+            <span class="scoreNum__val">1500</span>
+          </div>
+        </div>
+        <div class="scoreProgress">
+          <div class="scoreProgress__fill" id="scoreFill"></div>
+        </div>
+        <div class="scoreProgress__labels">
+          <span class="scoreProgress__label">0</span>
+          <span class="scoreProgress__label" id="scorePct"></span>
+          <span class="scoreProgress__label">1600</span>
+        </div>
+      </div>
+
+      <div class="pCard streakCard">
+        <div class="streakCard__title">Серия</div>
+        <div class="streakNum">7</div>
+        <div class="streakSubLabel">күн қатарынан</div>
+        <div class="streakDots" id="streakDots"></div>
+      </div>
+
+    </div>
+
+    <!-- WEEKLY PLAN -->
+    <section class="weekSection">
+      <h2 class="pTitle">Апталық жоспар</h2>
+      <div class="weekGrid">
+
+        <div class="pCard dayCard is-done">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Дүйсенбі</span>
+            <span class="dayCard__dot is-done"></span>
+          </div>
+          <span class="dayCard__subject">Алгебра</span>
+        </div>
+
+        <div class="pCard dayCard is-done">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Сейсенбі</span>
+            <span class="dayCard__dot is-done"></span>
+          </div>
+          <span class="dayCard__subject">Геометрия</span>
+        </div>
+
+        <div class="pCard dayCard is-done">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Сәрсенбі</span>
+            <span class="dayCard__dot is-done"></span>
+          </div>
+          <span class="dayCard__subject">Оқу</span>
+        </div>
+
+        <div class="pCard dayCard">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Бейсенбі</span>
+            <span class="dayCard__dot is-today"></span>
+          </div>
+          <span class="dayCard__subject">Жазу</span>
+        </div>
+
+        <div class="pCard dayCard">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Жұма</span>
+            <span class="dayCard__dot"></span>
+          </div>
+          <span class="dayCard__subject">Сөздік</span>
+        </div>
+
+        <div class="pCard dayCard">
+          <div class="dayCard__top">
+            <span class="dayCard__day">Сенбі</span>
+            <span class="dayCard__dot"></span>
+          </div>
+          <span class="dayCard__subject">Толық тест</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="achieveSection">
+      <h2 class="pTitle">Жетістіктер</h2>
+      <div class="achieveGrid">
+
+        <div class="pCard achieveCard">
+          <div class="achieveIcon achieveIcon--green">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10.5L8 14.5L16 6" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--green">Алынды</span>
+          <div class="achieveCard__name">Алғашқы тест</div>
+          <div class="achieveCard__desc">Бірінші толық тестті аяқтадыңыз</div>
+        </div>
+
+        <div class="pCard achieveCard">
+          <div class="achieveIcon achieveIcon--green">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M10 2C10 2 6 6.5 6 10a4 4 0 0 0 8 0c0-1.5-.8-3-1.6-4.2C11.6 7 11 8 11 9a1 1 0 0 1-2 0c0-2 1-4.5 1-7Z"
+                fill="#22c55e" opacity=".3" />
+              <path
+                d="M10 2C10 2 6 6.5 6 10a4 4 0 0 0 8 0c0-1.5-.8-3-1.6-4.2C11.6 7 11 8 11 9a1 1 0 0 1-2 0c0-2 1-4.5 1-7Z"
+                stroke="#22c55e" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--green">Алынды</span>
+          <div class="achieveCard__name">5 күн серия</div>
+          <div class="achieveCard__desc">5 күн қатарынан дайындалдыңыз</div>
+        </div>
+
+        <div class="pCard achieveCard">
+          <div class="achieveIcon achieveIcon--green">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2l2.09 4.26L17 7.27l-3.5 3.41.83 4.82L10 13.27l-4.33 2.23.83-4.82L3 7.27l4.91-.71L10 2Z"
+                fill="#22c55e" opacity=".25" stroke="#22c55e" stroke-width="1.6" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--green">Алынды</span>
+          <div class="achieveCard__name">1200+ балл</div>
+          <div class="achieveCard__desc">Тестте 1200 баллдан асып кеттіңіз</div>
+        </div>
+
+        <div class="pCard achieveCard">
+          <div class="achieveIcon achieveIcon--blue">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="7.5" stroke="#1d3be6" stroke-width="1.6" />
+              <circle cx="10" cy="10" r="4" stroke="#1d3be6" stroke-width="1.6" />
+              <circle cx="10" cy="10" r="1.5" fill="#1d3be6" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--blue">Орындалуда</span>
+          <div class="achieveCard__name">1400+ балл</div>
+          <div class="achieveCard__desc">1380 / 1400 — мақсатқа жақын</div>
+        </div>
+
+        <div class="pCard achieveCard">
+          <div class="achieveIcon achieveIcon--blue">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="4" width="14" height="13" rx="2.5" stroke="#1d3be6" stroke-width="1.6" />
+              <path d="M7 2v4M13 2v4M3 8.5h14" stroke="#1d3be6" stroke-width="1.6" stroke-linecap="round" />
+              <path d="M7 12h1.5M9.5 12H11M7 14.5h1.5M9.5 14.5H11M12.5 12H14M12.5 14.5H14" stroke="#1d3be6"
+                stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--blue">Орындалуда</span>
+          <div class="achieveCard__name">30 күн серия</div>
+          <div class="achieveCard__desc">7 / 30 күн қатарынан дайындалу</div>
+        </div>
+
+        <div class="pCard achieveCard is-locked">
+          <div class="achieveIcon achieveIcon--gray">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="4.5" y="9" width="11" height="8.5" rx="2" stroke="#6b7280" stroke-width="1.6" />
+              <path d="M7 9V6.5a3 3 0 0 1 6 0V9" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" />
+              <circle cx="10" cy="13.5" r="1.2" fill="#6b7280" />
+            </svg>
+          </div>
+          <span class="achieveBadge achieveBadge--gray">Жабық</span>
+          <div class="achieveCard__name">1550+ балл</div>
+          <div class="achieveCard__desc">Тестте 1550 баллдан асыңыз</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="historySection">
+      <h2 class="pTitle">Тарих</h2>
+      <div class="historyGrid">
+
+        <div class="pCard historyCard">
+          <div class="historyCard__top">
+            <span class="historyCard__date">21.01.2026</span>
+            <span class="historyCard__delta historyCard__delta--down">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 2v8M2.5 6.5L6 10l3.5-3.5" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              −20
+            </span>
+          </div>
+          <span class="historyCard__score">1380</span>
+          <span class="historyCard__label">балл</span>
+        </div>
+
+        <div class="pCard historyCard">
+          <div class="historyCard__top">
+            <span class="historyCard__date">14.01.2026</span>
+            <span class="historyCard__delta historyCard__delta--up">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 10V2M2.5 5.5L6 2l3.5 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              +180
+            </span>
+          </div>
+          <span class="historyCard__score">1400</span>
+          <span class="historyCard__label">балл</span>
+        </div>
+
+        <div class="pCard historyCard">
+          <div class="historyCard__top">
+            <span class="historyCard__date">07.01.2026</span>
+            <span class="historyCard__delta historyCard__delta--up">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M6 10V2M2.5 5.5L6 2l3.5 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              +180
+            </span>
+          </div>
+          <span class="historyCard__score">1220</span>
+          <span class="historyCard__label">балл</span>
+        </div>
+
+        <div class="pCard historyCard">
+          <div class="historyCard__top">
+            <span class="historyCard__date">31.12.2025</span>
+            <span class="historyCard__delta historyCard__delta--same">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6h8" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              старт
+            </span>
+          </div>
+          <span class="historyCard__score">1040</span>
+          <span class="historyCard__label">балл</span>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script src="project/js/main.js"></script>
+  <script src="project/js/profile.js"></script>
+  <script>
+    /* SCORE PROGRESS */
+    function updateScoreUI(current) {
+      const max = 1600;
+      const pct = Math.round((current / max) * 100);
+
+      document.getElementById('latestScore').innerText = current;
+      document.getElementById('scorePct').textContent = pct + '%';
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          document.getElementById('scoreFill').style.width = pct + '%';
+        }, 300);
+      });
+    }
+
+    /* STREAK DOTS WITH DAY LABELS */
+    const streakDays = ['Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб', 'Жк', 'Дс', 'Сс', 'Ср'];
+    const streakDone = 7;
+    const dotsEl = document.getElementById('streakDots');
+
+    streakDays.forEach((label, i) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:5px;';
+
+      const dot = document.createElement('div');
+      dot.className = 'streakDot';
+
+      const lbl = document.createElement('span');
+      lbl.textContent = label;
+      lbl.style.cssText = 'font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.2px;';
+
+      wrap.appendChild(dot);
+      wrap.appendChild(lbl);
+      dotsEl.appendChild(wrap);
+
+      if (i < streakDone) {
+        setTimeout(() => dot.classList.add('is-done'), 400 + i * 80);
+      }
+    });
+
+    function handleLogout() {
+      // Clear any stored session/auth data
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+
+</html>

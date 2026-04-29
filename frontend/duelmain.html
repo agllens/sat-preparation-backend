@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAT Duel</title>
+  
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+
+  <style>
+    /* ── RESET & BASE ── */
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#f4f5f8;color:#111318;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* ── DUEL PAGE CONTENT ── */
+    .dMain{flex:1;display:flex;flex-direction:column;align-items:center;padding:120px 24px 80px;text-align:center;}
+    .dMain__title{font-size:52px;font-weight:800;color:#1d3be6;letter-spacing:-1px;line-height:1.1;margin-bottom:24px;}
+    .dMain__desc{font-size:18px;font-weight:500;color:#6b7280;line-height:1.7;max-width:640px;margin:0 auto 56px;}
+
+    /* arena rings animation */
+    .dArena{position:relative;width:100%;max-width:520px;height:280px;margin-bottom:52px;display:flex;align-items:center;justify-content:center;}
+    .dRing{position:absolute;border-radius:50%;border:1.5px solid rgba(29,59,230,0.10);top:50%;left:50%;transform:translate(-50%,-50%);}
+    .dRing:nth-child(1){width:110px;height:110px;}
+    .dRing:nth-child(2){width:200px;height:200px;}
+    .dRing:nth-child(3){width:300px;height:300px;}
+    .dRing:nth-child(4){width:400px;height:400px;}
+    .dRing:nth-child(5){width:510px;height:510px;}
+    .dAvatar{position:relative;z-index:2;width:90px;height:90px;border-radius:50%;background:#fff;box-shadow:0 4px 20px rgba(29,59,230,0.16);display:flex;align-items:center;justify-content:center;}
+
+    /* buttons */
+    .dBtns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+    .dBtn--primary{height:56px;padding:0 36px;background:#1d3be6;color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all 150ms;}
+    .dBtn--primary:hover{filter:brightness(0.9);transform:translateY(-2px);}
+    .dBtn--outline{height:56px;padding:0 36px;background:transparent;color:#1d3be6;border:2px solid #1d3be6;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:all 150ms;}
+    .dBtn--outline:hover{background:rgba(29,59,230,0.08);transform:translateY(-2px);}
+  </style>
+</head>
+
+<!-- AI Chat Float Button -->
+<style>
+  .ai-float {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  /* Tooltip label that appears on hover */
+  .ai-float__label {
+    background: #111318;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .ai-float__label::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    background: #111318;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .ai-float:hover .ai-float__label {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Button itself */
+  .ai-float__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #1d3be6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(29, 59, 230, 0.38),
+      0 2px 6px rgba(29, 59, 230, 0.18);
+    transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .ai-float__btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow:
+      0 16px 36px rgba(29, 59, 230, 0.44),
+      0 4px 10px rgba(29, 59, 230, 0.20);
+  }
+
+  .ai-float__btn:active {
+    transform: scale(0.93);
+  }
+
+  .ai-float__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Pulse ring */
+  .ai-float__btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 2px solid rgba(29, 59, 230, 0.35);
+    animation: floatPulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(1.28); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 600px) {
+    .ai-float { bottom: 20px; right: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-float__btn::before { animation: none; }
+  }
+</style>
+
+<div class="ai-float">
+  <div class="ai-float__label">AI Кеңесші</div>
+  <a href="ai-chat.html" class="ai-float__btn" aria-label="AI Кеңесші">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 10h8M8 13.5h5"/>
+    </svg>
+  </a>
+</div>
+<body>
+
+<div id="header-mount"></div>
+
+<main class="dMain">
+  <h1 class="dMain__title">SAT Duel ойнау</h1>
+  <p class="dMain__desc">
+    Бұл режимде екі оқушы онлайн түрде бір-бірімен SAT сұрақтарын шешіп жарысады.
+    Жүйе оларды автоматты түрде сәйкестендіріп, бірдей сұрақтарды береді.
+    Кім тез әрі дұрыс жауап берсе — сол жеңеді.
+  </p>
+
+  <div class="dArena">
+    <div class="dRing"></div><div class="dRing"></div><div class="dRing"></div>
+    <div class="dRing"></div><div class="dRing"></div>
+    <div class="dAvatar">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1d3be6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="dBtns">
+    <a class="dBtn--primary" href="duelvs.html">Кездейсоқ қарсылас табу</a>
+    <a class="dBtn--outline" href="duelvs.html">Досыңмен ойнау</a>
+  </div>
+</main>
+
+<div id="footer-mount"></div>
+
+<script src="project/js/main.js"></script>
+
+<script>
+  /**
+   * SAFETY GUARD:
+   * We wait for the window to finish loading everything 
+   * so the buttons and header are ready before we try to use them.
+   */
+  window.onload = function() {
+    
+    // Check for logged in user to show the profile icon
+    const u = JSON.parse(localStorage.getItem('satifyUser') || 'null');
+    
+    // We use a small delay to make sure main.js finished putting the header in
+    setTimeout(() => {
+      const actionsEl = document.getElementById('headerActions');
+      if (actionsEl && u && u.name) {
+        const names = u.name.trim().split(/\s+/);
+        const initials = (names[0]?.[0] || '') + (names[1]?.[0] || '');
+        
+        actionsEl.innerHTML = `
+          <div style="width:40px;height:40px;border-radius:50%;background:#1d3be6;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;" 
+               onclick="location.href='profile.html'">
+            ${initials.toUpperCase()}
+          </div>`;
+      }
+    }, 100); 
+
+  };
+</script>
+
+</body>
+</html>
